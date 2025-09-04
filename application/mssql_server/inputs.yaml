@@ -1,0 +1,137 @@
+dsl_definitions:
+
+  mssql_server_installer_filename: &mssql_server_installer_filename
+    concat:
+      - { get_input: mssql_server_version }
+      - "-x64-ENU.iso"
+
+  mssql_server_installer_url: &mssql_server_installer_url
+    concat:
+      - { get_attribute: [validate_secrets, installer_url] }
+      - *mssql_server_installer_filename
+      - { get_input: artifact_base_url_parameters }
+
+  sm_db_migrations_filename: &sm_db_migrations_filename
+    XMIdentity.Database.Console.exe
+
+  sm_db_migrations_url: &sm_db_migrations_url
+    concat:
+      - { get_attribute: [validate_secrets, installer_url] }
+      - *sm_db_migrations_filename
+      - { get_input: artifact_base_url_parameters }
+
+  ds_db_migrations_filename: &ds_db_migrations_filename
+    XMIoT.Database.Console.exe
+
+  ds_db_migrations_url: &ds_db_migrations_url
+    concat:
+      - { get_attribute: [validate_secrets, installer_url] }
+      - *ds_db_migrations_filename
+      - { get_input: artifact_base_url_parameters }
+
+  ad_db_migrations_filename: &ad_db_migrations_filename
+    AppDesigner.Database.Console.exe
+
+  ad_db_migrations_url: &ad_db_migrations_url
+    concat:
+      - { get_attribute: [validate_secrets, installer_url] }
+      - *ad_db_migrations_filename
+      - { get_input: artifact_base_url_parameters }
+
+inputs:
+
+  mssql_server_version:
+    type: string
+    hidden: false
+    allow_update: false
+    display_label: Microsoft SQL Server Version
+    description: Microsoft SQL Server Version to be installed.
+    default: SQLServer2022
+    constraints:
+      - valid_values:
+        - SQLServer2019
+        - SQLServer2022
+    display:
+      group: xmpro_mssql
+      index: 1080
+
+  mssql_server_installation_dir:
+    type: string
+    hidden: true
+    display_label: Microsoft SQL Server Installation Directory
+    description: >
+      Directory on the newly created Windows Virtual Machine for Microsoft SQL Server.
+    default:
+      concat:
+        - 'C:\Users\'
+        - { get_input: db_vm_user_name }
+        - '\SQL_Server'
+
+  mssql_server_installer_filename:
+    type: string
+    hidden: true
+    display_label: Microsoft SQL Server Installer File Name
+    description: >
+      Microsoft SQL Server ISO File Name. Supported versions:
+      Microsoft SQL Server 2019 and Microsoft SQL Server 2022.
+    default: *mssql_server_installer_filename
+
+  mssql_server_installer_url:
+    type: string
+    hidden: true
+    display_label: Microsoft SQL Server Installer URL
+    description: >
+      Microsoft SQL Server ISO URL. Supported versions:
+      Microsoft SQL Server 2019 and Microsoft SQL Server 2022.
+    default: *mssql_server_installer_url
+
+  sm_db_migrations_filename:
+    type: string
+    hidden: true
+    display_label: Subscription Manager DB Migrations File Name
+    description: >
+      Subscription Manager DB Migrations XMIdentity.Database.Console
+      file name.
+    default: *sm_db_migrations_filename
+
+  sm_db_migrations_url:
+    type: string
+    hidden: true
+    display_label: Subscription Manager DB Migrations URL
+    description: >
+      Subscription Manager DB Migrations XMIdentity.Database.Console URL.
+    default: *sm_db_migrations_url
+
+  ds_db_migrations_filename:
+    type: string
+    hidden: true
+    display_label: Data Stream Designer DB Migrations File Name
+    description: >
+      Data Stream Designer DB Migrations XMIoT.Database.Console
+      file name.
+    default: *ds_db_migrations_filename
+
+  ds_db_migrations_url:
+    type: string
+    hidden: true
+    display_label: Data Stream Designer DB Migrations URL
+    description: >
+      Data Stream Designer DB Migrations XMIoT.Database.Console URL.
+    default: *ds_db_migrations_url
+
+  ad_db_migrations_filename:
+    type: string
+    hidden: true
+    display_label: Application Designer DB Migrations File Name
+    description: >
+      Application Designer DB Migrations AppDesigner.Database.Console
+      file name.
+    default: *ad_db_migrations_filename
+
+  ad_db_migrations_url:
+    type: string
+    hidden: true
+    display_label: Application Designer DB Migrations URL
+    description: >
+      Application Designer DB Migrations AppDesigner.Database.Console URL.
+    default: *ad_db_migrations_url

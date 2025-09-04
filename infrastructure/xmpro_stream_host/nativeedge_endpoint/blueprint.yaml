@@ -1,0 +1,191 @@
+imports:
+  - plugin:edge-plugin
+  - plugin:utilities-plugin?version=>=3.0.0.0
+
+dsl_definitions:
+
+  ansible_common_inputs: &ansible_common_inputs
+    ansible_external_venv: { get_input: ansible_external_venv }
+    sources: { get_property: [SELF, sources] }
+    sensitive_keys: { get_property: [SELF, sensitive_keys] }
+    log_stdout: { get_input: ansible_log_stdout }
+    store_facts: false
+    debug_level: 0
+
+  stream_host_vm: &ansible_stream_host_vm_host
+    ansible_user:
+      get_attribute: [vm_nativeedge, capabilities, vm_username]
+    ansible_password:
+      get_secret: { get_input: vm_password_secret_name }
+    ansible_connection:
+      winrm
+    ansible_winrm_scheme:
+      http
+    ansible_winrm_transport:
+      ntlm
+    ansible_winrm_operation_timeout_sec:
+      180
+    ansible_winrm_read_timeout_sec:
+      360
+
+  get_windows_vm_ip_playbook_path: &get_windows_vm_ip_playbook_path
+    application/ansible/get_windows_vm_ip.yaml
+
+node_templates:
+
+  binary_image:
+    type: dell.nodes.nativeedge.template.BinaryImage
+    properties:
+      binary_image_config:
+        artifact:
+          path:
+            get_input: binary_image_artifact_url
+          username:
+            get_input: binary_image_artifact_username
+          access_token:
+            get_secret:
+              get_input: binary_image_artifact_access_token_secret_name
+        version:
+          get_input: binary_image_version
+    interfaces:
+      dell.interfaces.lifecycle:
+        precreate:
+          implementation:
+            edge.nativeedge_plugin.tasks.validate_binary_image_config
+        create:
+          implementation:
+            edge.nativeedge_plugin.tasks.upload_binary
+        delete:
+          implementation:
+            edge.nativeedge_plugin.tasks.delete_binary
+    relationships:
+      - type: dell.relationships.depends_on
+        target: validate_secrets
+
+  vm_nativeedge:
+    type: dell.nodes.ServiceComponent
+    properties:
+      resource_config:
+        blueprint:
+          external_resource: true
+          id: Windows_Virtual_Machine_for_NativeEdge_Endpoint
+          revision_id: 3.1.1.0
+        deployment:
+          display_name:
+            concat:
+              - "SH-vm-"
+              - { get_sys: [deployment, name] }
+          auto_inc_suffix: true
+          inputs:
+            vm_user_name:
+              get_input: vm_user_name
+            vm_password_secret_name:
+              get_input: vm_password_secret_name
+            service_tag:
+              get_environment_capability: ece_service_tag
+            name:
+              get_input: hostname
+            image:
+              get_attribute: [binary_image, binary_details, extra, artifact_id]
+            os_type:
+              get_input: os_type
+            cpu:
+              get_input: vcpus
+            memory:
+              get_input: memory_size
+            storage:
+              get_input: os_disk_size
+            disk:
+              get_input: disk
+            hardware_options.vTPM:
+              get_input: hardware_options.vTPM
+            hardware_options.secure_boot:
+              get_input: hardware_options.secure_boot
+            hardware_options.firmware_type:
+              get_input: hardware_options.firmware_type
+            enable_management:
+              get_input: enable_management
+            dhcp:
+              get_input: dhcp
+            static_ip:
+              get_input: static_ip
+            dns:
+              get_input: dns
+            gateway:
+              get_input: gateway
+            network_settings:
+              get_input: network_settings
+            usb: { jmespath: ["* || `[]`", {"input": { get_input: usb }}] }
+            serial_port: { jmespath: ["* || `[]`", {"input": { get_input: serial_port }}] }
+            video: { jmespath: ["* || `[]`", {"input": { get_input: video }}] }
+            gpu: { jmespath: ["* || `[]`", {"input": { get_input: gpu_passthrough }}] }
+            cloudinit:
+              get_input: cloudinit
+            iso_files:
+              get_input: iso_files
+    relationships:
+      - type: dell.relationships.depends_on
+        target: binary_image
+
+  vm_nativeedge_ip:
+    type: dell.nodes.ansible.Executor
+    properties:
+      ansible_external_venv: { get_input: ansible_external_venv }
+      number_of_attempts: 60
+      inventory_proxy_settings:
+        connection:
+          ip:
+            get_attribute: [vm_nativeedge, capabilities, vm_name]
+          port: 5985
+      sources:
+        all:
+          hosts:
+            win:
+              <<: *ansible_stream_host_vm_host
+              ansible_host:
+                get_attribute: [SELF, inventory_proxy_settings, connection, ip]
+              ansible_port:
+                get_attribute: [SELF, inventory_proxy_settings, connection, port]
+    interfaces:
+      dell.interfaces.lifecycle:
+        start:
+          timeout: 1800
+          max_retries: 60
+          retry_interval: 30
+          implementation: ansible.plugins_ansible.tasks.run
+          inputs:
+            <<: *ansible_common_inputs
+            playbook_path: *get_windows_vm_ip_playbook_path
+            run_data:
+              node_instance_id:
+                get_attribute: [SELF, node_instance_id]
+              tap_nic_mac:
+                get_attribute: [vm_nativeedge, capabilities, vm_tap_mac_addr]
+            sensitive_keys:
+              - ansible_user
+              - ansible_password
+              - ansible_ssh_private_key_file
+    relationships:
+      - type: dell.relationships.depends_on
+        target: vm_nativeedge
+
+  stream_host_vm:
+    type: dell.nodes.Root
+    interfaces:
+      dell.interfaces.lifecycle:
+        start:
+          implementation: infrastructure/common/scripts/get_vm_info.py
+          executor: central_deployment_agent
+          inputs:
+            vm_host:
+              get_attribute: [vm_nativeedge, capabilities, vm_name]
+            vm_winrm_port: 5985
+            vm_name:
+              get_attribute: [vm_nativeedge, capabilities, vm_name]
+            vm_username:
+              get_attribute: [vm_nativeedge, capabilities, vm_username]
+            vm_nativeedge_node_id:
+              get_attribute: [vm_nativeedge_ip, node_instance_id]
+    relationships:
+      - type: dell.relationships.depends_on
+        target: vm_nativeedge_ip

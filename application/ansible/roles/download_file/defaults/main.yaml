@@ -1,0 +1,3 @@
+---
+artifact_validate_certs: false
+censor_sensitive_data: true

@@ -1,0 +1,34 @@
+---
+- name: Verify if EXE is already installed
+  ansible.windows.win_shell: |
+    $exePath = Get-ItemProperty `
+      'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\{{ process }}.exe' `
+      -ErrorAction SilentlyContinue
+    if ($exePath -ne $null) {
+        "{{ process }} is installed"
+    } else {
+        "{{ process }} is not installed"
+    }
+  register: exe_already_installed
+  become: true
+
+- name: Install EXE File
+  ansible.windows.win_shell: |
+    & {{ installation_dir }}\{{ filename }}
+    $counter = 0
+    while ($counter -lt 36) {
+      $exePath = Get-ItemProperty `
+        'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\{{ process }}.exe' `
+        -ErrorAction SilentlyContinue
+      if ($exePath) {
+        Write-Output "{{ filename }} is installed"
+        break
+      }
+      Write-Host "Waiting for {{ filename }} to finish..."
+      Start-Sleep -Seconds 10
+      $counter++
+    }
+  args:
+    chdir: "{{ installation_dir }}"
+  when: '"not installed" in exe_already_installed.stdout'
+  become: true

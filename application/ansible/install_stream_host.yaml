@@ -1,0 +1,72 @@
+---
+- name: Install XMPro Stream Host
+  hosts: win
+  become_method: runas
+  become_user: "{{ vm_user_name | default('Administrator') }}"
+  gather_facts: false
+  tasks:
+  - name: Prepare environment
+    include_role:
+      name: prepare_environment
+    vars:
+      installation_dir: "{{ stream_host_installation_dir }}"
+
+  - name: Update etc hosts
+    community.windows.win_lineinfile:
+      path: "C:\\Windows\\System32\\drivers\\etc\\hosts"
+      line: "{{ ds_ip }}   {{ ds_hostname | lower }}"
+
+  - name: SH certificate
+    include_role:
+      name: stream_host_certificate
+    vars:
+      stream_host_installation_dir: "{{ stream_host_installation_dir }}"
+      cert_path: "{{ cert_path }}"
+
+  - name: SH Exec file download
+    include_role:
+      name: download_file
+    vars:
+      artifact_url: "{{ stream_host_installer_url }}"
+      artifact_validate_certs: "{{ artifact_validate_certs }}"
+      artifact_headers: "{{ artifact_headers }}"
+      artifact_target_path: "{{ stream_host_installation_dir }}\\{{ stream_host_service_filename }}"
+      censor_sensitive_data: "{{ censor_sensitive_data }}"
+
+  - name: Download Dotnet
+    include_role:
+      name: download_file
+    vars:
+      artifact_url: "{{ ms_dotnet_core_hosting_bundle_url }}"
+      artifact_validate_certs: "{{ artifact_validate_certs }}"
+      artifact_headers: "{{ artifact_headers }}"
+      artifact_target_path: "{{ stream_host_installation_dir }}\\{{ ms_dotnet_core_hosting_bundle_filename }}"
+      censor_sensitive_data: "{{ censor_sensitive_data }}"
+
+  - name: Install Dotnet
+    include_role:
+      name: start_process
+    vars:
+      filename: "{{ ms_dotnet_core_hosting_bundle_filename }}"
+      arguments: "/repair /passive /norestart"
+      installation_dir: "{{ stream_host_installation_dir }}"
+
+  - name: Unzip installer to the target directory
+    ansible.windows.win_shell: |
+      $ShFilePathExec = "{{ stream_host_service_filename }}"
+      $ShFilePath = "{{ stream_host_service_filename | replace('.exe', '') }}"
+      $ShFilePathZip = "{{ stream_host_service_filename | replace('.exe', '.zip') }}"
+      Copy-Item -Path $ShFilePathExec -Destination $ShFilePathZip -Force
+    args:
+      chdir: "{{ stream_host_installation_dir }}"
+
+  - name: Install stream host
+    include_role:
+      name: install_stream_host
+    vars:
+      stream_host_installation_dir: "{{ stream_host_installation_dir }}"
+      stream_host_service_filename: "{{ stream_host_service_filename }}"
+      stream_host_services_information: "{{ stream_host_services_information }}"
+      ds_server_url: "https://{{ ds_hostname | lower }}/"
+      sh_msi_exec_file: "{{ sh_msi_exec_file }}"
+      sh_services: "{{ sh_services }}"

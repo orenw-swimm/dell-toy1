@@ -1,0 +1,13 @@
+---
+- name: Update Hosts File
+  community.windows.win_lineinfile:
+    path: C:\Windows\System32\drivers\etc\hosts
+    insertafter: EOF
+    line: "{{ item }}"
+    state: present
+    create: true
+  loop:
+    - "{{ sm_ip }}   {{ sm_hostname }}"
+    - "{{ ad_ip }}   {{ ad_hostname }}"
+    - "{{ ds_ip }}   {{ ds_hostname }}"
+  become: true

@@ -1,0 +1,40 @@
+tosca_definitions_version: dell_1_0
+
+description: >
+  Blueprint creates a Windows Virtual Machine on NativeEdge Endpoint and installs
+  one or multiple instances of XMPro Stream Host on top of it using
+  Ansible Playbooks.
+
+imports:
+  - dell/types/types.yaml
+  # Infrastructure - NativeEdge Endpoint
+  - infrastructure/xmpro_stream_host/nativeedge_endpoint/inputs.yaml
+  - tests/infrastructure/xmpro_stream_host/nativeedge_endpoint/blueprint.yaml
+  # Application - XMPro Stream Host
+  - application/stream_host/inputs.yaml
+  - application/stream_host/inputs_common.yaml
+  - tests/application/stream_host/blueprint.yaml
+  # Outputs
+  - application/stream_host/outputs.yaml
+
+labels:
+  csys-obj-type:
+    values:
+      - service
+  target_environment:
+    values:
+      - ned
+  vendor:
+    values:
+      - xmpro
+  solution:
+    values:
+      - stream_host
+  version:
+    values:
+      - "4.3.7.0"
+
+blueprint_labels:
+  env:
+    values:
+      - NED

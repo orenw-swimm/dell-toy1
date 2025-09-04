@@ -1,0 +1,43 @@
+---
+- name: Install XMPro Data Stream Designer IIS Website
+  hosts: data_stream_designer_vm
+  become_method: runas
+  become_user: "{{ vm_user_name | default('Administrator') }}"
+  gather_facts: false
+  roles:
+  - role: extract_iis_zip
+    vars:
+      installation_dir: "{{ installation_dir }}"
+      zip_filename: "{{ zip_filename }}"
+      website_directory: "C:\\inetpub\\wwwroot"
+      destination_path: "C:\\inetpub\\wwwroot"
+
+  - role: set_env_variables
+    vars:
+      censor_sensitive_data: "{{ censor_sensitive_data }}"
+      environment_variables:
+        xmpro__xmidentity__client__id: "{{ ds_product_id }}"
+        xmpro__xmidentity__client__sharedkey: "{{ ds_product_key }}"
+        xmpro__xmidentity__client__baseUrl: "https://{{ ds_hostname | lower }}/"
+        xmpro__xmidentity__server__baseUrl: "https://{{ sm_hostname | lower }}/"
+        xmpro__data__connectionString:
+          "Server=tcp:{{ sql_ip }};initial catalog=DS;persist security info=True;user id=XMProUser;password={{ xmpro_password }};"
+        xmpro__xmsettings__data__connectionString:
+          "Server=tcp:{{ sql_ip }};initial catalog=DS;persist security info=True;user id=XMProUser;password={{ xmpro_password }};"
+        xmpro__xmsettings__adminRole: "Administrator"
+
+  - role: restart_iis_service
+
+  - role: start_process
+    vars:
+      filename: "{{ ms_dotnet_core_hosting_bundle_filename }}"
+      arguments: "/repair /passive /norestart"
+      installation_dir: "{{ installation_dir }}"
+
+  - role: restart_iis_service
+
+  - role: clean_up_environment
+    vars:
+      installation_dir: "{{ installation_dir }}"
+
+  - role: reboot_machine

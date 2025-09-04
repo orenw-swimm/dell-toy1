@@ -1,0 +1,45 @@
+---
+- name: Mount ISO media
+  ansible.windows.win_shell:
+    Mount-DiskImage {{ installation_dir }}\{{ iso_filename }}
+  become: true
+
+- name: Pause for ISO mounting
+  ansible.builtin.pause:
+    seconds: 20
+
+- name: Get drive letter for volumes with label "{{ mssql_server_version }}"
+  ansible.windows.win_shell:
+    '(Get-Volume | Where-Object { $_.FileSystemLabel -like "Sql*" }).DriveLetter'
+  register: drive_letters_result
+
+- name: Extract the first drive letter
+  ansible.builtin.set_fact:
+    mounted_drive: "{{ drive_letters_result.stdout_lines | first | regex_replace('\r\n|\r|\n', '') }}"
+
+- name: Run SQL Server installation
+  ansible.windows.win_shell: >
+    .\setup.exe
+    /QUIET
+    /ACTION=install
+    /UPDATEENABLED=false
+    /IACCEPTSQLSERVERLICENSETERMS
+    /FEATURES="SQL,AS,IS,Tools"
+    /INSTANCENAME="MSSQLSERVER"
+    /SQLSVCACCOUNT="NT Service\MSSQLSERVER"
+    /SQLSYSADMINACCOUNTS="BUILTIN\Administrators"
+    /AGTSVCACCOUNT="NT Service\SQLSERVERAGENT"
+    /ASSVCACCOUNT="NT Service\MSSQLServerOLAPService"
+    /ASSYSADMINACCOUNTS="BUILTIN\Administrators"
+    /TCPENABLED=1
+    /NPENABLED=1
+  args:
+    chdir: "{{ mounted_drive }}:"
+  when: mounted_drive is defined and mounted_drive != ''
+  register: sql_install_result
+  failed_when: >
+    sql_install_result.rc not in [0, 1641, 3010]
+    and
+    'You should restart your computer to complete this process' not in sql_install_result.stdout
+    and
+    'The requested features may already be installed' not in sql_install_result.stdout

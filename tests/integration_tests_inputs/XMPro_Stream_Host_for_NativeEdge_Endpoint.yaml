@@ -1,0 +1,21 @@
+# Infrastructure - NativeEdge Endpoint Windows VM
+
+vm_user_name: Administrator
+vm_password_secret_name: xmpro_int_win_vm_password
+hostname: XMPro-SH
+os_type: WIN2019-SERVER
+vcpus: 8
+memory_size: 8GB
+os_disk_size: 150GB
+disk: /DataStore0
+dhcp: true
+segment_name: BRIDGED
+
+# Application - XMPro Stream Host on Windows
+
+# xmpro_suite_deployment_id: provided directly from tox.ini file
+stream_host_instance_number_for_default: 2
+additional_instances_for_non_default_collection: []
+artifact_configuration_secret_name: xmpro_artifact_configuration
+win_get_url_validate_certs: false
+environment_type: airgapped

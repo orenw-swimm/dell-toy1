@@ -1,0 +1,39 @@
+# Infrastructure - vSphere Windows VM
+
+vm_template: my_vm_template
+hostname: XMProSH
+vm_user_name: Administrator
+vm_password_secret_name: vm_password
+resource_pool_name: myresourcepool
+vm_folder: myfolder
+datastore_name: mydatastore
+allowed_esxi_host: []
+vcpus: 4
+memory_size: 16384
+os_disk_size: 150
+disk_provisioning: thin
+network:
+  name: vlan-1710
+  switch_distributed: true
+  management: true
+  external: true
+cidr: '127.0.0.0/8'
+dns: []
+dhcp: false
+gateway: "127.0.0.1"
+static_ip: "127.0.0.2"
+
+# Application - XMPro Stream Host on Windows
+
+# xmpro_suite_deployment_id: provided directly from tox.ini file
+stream_host_instance_number_for_default: 3
+additional_instances_for_non_default_collection:
+  - collection_id: test1
+    collection_secret: test1
+    number_of_instances: 2
+  - collection_id: test2
+    collection_secret: test2
+    number_of_instances: 9
+artifact_configuration_secret_name: xmpro_artifact_configuration
+win_get_url_validate_certs: false
+environment_type: internet_connected

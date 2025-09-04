@@ -1,0 +1,7 @@
+---
+stream_host_installation_dir: C:\Users\Administrator\XMPro_stream_Host
+stream_host_service_filename: StreamHost-win10-x64-v4.3.7.exe
+stream_host_services_information: ""
+ds_server_url: "https://test/"
+sh_msi_exec_file: ""
+sh_services: []

@@ -1,0 +1,23 @@
+capabilities:
+
+# MSSQL Server VM
+
+  microsoft_sql_vm_ip:
+    description: Microsoft SQL Server Virtual Machine IP Address
+    value:
+      get_attribute: [mssql_server_vm, capabilities, vm_public_ip]
+
+  microsoft_sql_vm_name:
+    description: Microsoft SQL Server Virtual Machine Name
+    value:
+      get_attribute: [mssql_server_vm, capabilities, vm_name]
+
+  microsoft_sql_vm_user_name:
+    description: Microsoft SQL Server Virtual Machine User Name
+    value:
+      get_attribute: [mssql_server_vm, capabilities, vm_username]
+
+  microsoft_sql_vm_user_password_secret_name:
+    description: Microsoft SQL Server Virtual Machine User Password Secret Name
+    value:
+      get_input: db_vm_password_secret_name

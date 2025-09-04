@@ -1,0 +1,7 @@
+---
+- name: Run MSI file installation
+  ansible.windows.win_package:
+    path: "{{ installation_dir }}\\{{ filename }}"
+    state: present
+    arguments: /qn /norestart
+  become: true

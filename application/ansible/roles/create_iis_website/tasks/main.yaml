@@ -1,0 +1,43 @@
+---
+- name: Remove Default Web Site
+  community.windows.win_iis_website:
+    name: "Default Web Site"
+    state: absent
+
+- name: Create {{ website_name }} Web Site
+  community.windows.win_iis_website:
+    name: "{{ website_name }}"
+    state: started
+    physical_path: "{{ website_path }}"
+    ip: "127.0.0.1"
+
+- name: Add HTTPS binding with cert to {{ website_name }} website
+  ansible.windows.win_shell: |
+    $websiteName = "{{ website_name }}"
+    $hostname = hostname
+    $thumbprint = "{{ cert_thumbprint.thumbprints[0] }}"
+    New-WebBinding `
+      -Name "$websiteName" `
+      -IP "*" `
+      -Port 443 `
+      -Protocol "https"
+    $httpsBinding = Get-WebBinding `
+      -Name "$websiteName" `
+      -Protocol "https"
+    $httpsBinding.AddSslCertificate("$thumbprint", "my")
+  become: true
+
+- name: Remove the default HTTP binding
+  community.windows.win_iis_webbinding:
+    name: "{{ website_name }}"
+    port: 80
+    ip: "127.0.0.1"
+    state: absent
+
+- name: Update DefaultAppPool Identity
+  ansible.windows.win_shell: |
+    Import-Module WebAdministration
+    $appPool = Get-Item -Path "IIS:\AppPools\DefaultAppPool"
+    $appPool.processModel.identityType = 0
+    $appPool | Set-Item
+  become: true

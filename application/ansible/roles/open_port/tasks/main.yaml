@@ -1,0 +1,11 @@
+---
+- name: Open port for remote connections to server
+  community.windows.win_firewall_rule:
+    name: "{{ rule_name }}"
+    localport: "{{ localport }}"
+    action: allow
+    direction: in
+    protocol: "{{ protocol }}"
+    profiles: domain,private,public
+    state: present
+    enabled: true

@@ -1,0 +1,39 @@
+dsl_definitions:
+
+  data_stream_designer_zip_filename: &data_stream_designer_zip_filename
+    DS.zip
+
+  data_stream_designer_zip_url: &data_stream_designer_zip_url
+    concat:
+      - { get_attribute: [validate_secrets, installer_url] }
+      - *data_stream_designer_zip_filename
+      - { get_input: artifact_base_url_parameters }
+
+inputs:
+
+  ds_installation_dir:
+    type: string
+    hidden: true
+    display_label: XMPro Data Stream Designer Installation Directory
+    description: >
+      Directory on the newly created Windows Virtual Machine
+      for XMPro Data Stream Designer that stores the installation files.
+    default:
+      concat:
+        - 'C:\Users\'
+        - { get_input: ds_vm_user_name }
+        - '\XMPro_Data_Stream_Designer'
+
+  data_stream_designer_zip_filename:
+    type: string
+    hidden: true
+    display_label: XMPro Data Stream Designer Installer File Name
+    description: XMPro Data Stream Designer Installer File Name
+    default: *data_stream_designer_zip_filename
+
+  data_stream_designer_zip_url:
+    type: string
+    hidden: true
+    display_label: XMPro Data Stream Designer Installer URL
+    description: XMPro Data Stream Designer Installer URL
+    default: *data_stream_designer_zip_url

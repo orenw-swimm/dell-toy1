@@ -1,0 +1,61 @@
+capabilities:
+
+# Common XMPro Outputs
+
+  xmpro_website_endpoint:
+    description: XMPro Subscription Manager Website Endpoint
+    value:
+      concat:
+        - "https://"
+        - { get_attribute: [get_subscription_manager_hostname, hostname] }
+        - "/"
+
+  site_admin_username:
+    description: XMPro Site Admin User Name
+    value: admin@xmpro.onxmpro.com
+
+  site_admin_password_secret_name:
+    description: XMPro Site Admin Password Secret Name
+    value:
+      get_input: site_admin_password_secret_name
+
+  company_admin_username:
+    description: XMPro Company Admin User Name
+    value:
+      concat:
+        - { get_input: first_name }
+        - "."
+        - { get_input: last_name }
+        - "@"
+        - { get_input: company_name }
+        - ".onxmpro.com"
+
+  company_admin_password_secret_name:
+    description: XMPro Company Admin Password Secret Name
+    value:
+      get_input: company_admin_password_secret_name
+
+  products_deployment_info:
+    description: XMPro Platform Deployment Information
+    value:
+      get_attribute: [upgrade_database, upgrade_db_output]
+
+  xmpro_certificate_secret_name:
+    description: >
+      Name of the secret containing XMPro Certificate Path for Stream Hosts
+    value:
+      get_attribute: [xmpro_certificate_secret, data, xmpro-certificate, key]
+
+  mssql_server_sa_password_secret_name:
+    description: >
+      Name of the secret containing the password set for the
+      System Administrator (sa) user of the Microsoft SQL Server
+    value:
+      get_attribute: [mssql_sa_password_secret, secret_name]
+
+  mssql_server_xmpro_password_secret_name:
+    description: >
+      Name of the secret containing the password set for the
+      XMPro user of the Microsoft SQL Server
+    value:
+      get_attribute: [mssql_xmpro_password_secret, secret_name]

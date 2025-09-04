@@ -1,0 +1,139 @@
+dsl_definitions:
+
+  subscription_manager_zip_filename: &subscription_manager_zip_filename
+    SM.zip
+
+  subscription_manager_zip_url: &subscription_manager_zip_url
+    concat:
+      - { get_attribute: [validate_secrets, installer_url] }
+      - *subscription_manager_zip_filename
+      - { get_input: artifact_base_url_parameters }
+
+  openssl_filename: &openssl_filename
+    internet_connected:
+      string_split: [{ get_input: openssl_url_internet_connected }, '/', -1]
+    airgapped: &openssl_filename_airgapped
+      Win64OpenSSL_Light.msi
+
+  openssl_url: &openssl_url
+    internet_connected:
+      get_input: openssl_url_internet_connected
+    airgapped:
+      concat:
+        - { get_attribute: [validate_secrets, installer_url] }
+        - *openssl_filename_airgapped
+        - { get_input: artifact_base_url_parameters }
+
+  ms_edge_filename: &ms_edge_filename
+    MicrosoftEdgeSetup.exe
+
+  ms_edge_url: &ms_edge_url
+    internet_connected:
+      https://c2rsetup.officeapps.live.com/c2r/downloadEdge.aspx?platform=Default&source=EdgeStablePage&Channel=Stable&language=en&brand=M100
+    airgapped:
+      concat:
+        - { get_attribute: [validate_secrets, installer_url] }
+        - *ms_edge_filename
+        - { get_input: artifact_base_url_parameters }
+
+inputs:
+
+  openssl_url_internet_connected:
+    type: string
+    hidden: false
+    allow_update: false
+    only_with:
+      environment_type: ['internet_connected']
+    display_label: OpenSSL Light Win64 MSI File URL
+    description: >
+      Direct URL to the OpenSSL Light Win64 MSI File.
+      Can be retrieved from: https://slproweb.com/products/Win32OpenSSL.html
+      Example: https://slproweb.com/download/Win64OpenSSL_Light-X_X_X.msi
+    display:
+      group: xmpro_sm
+      index: 1085
+
+  sm_installation_dir:
+    type: string
+    hidden: true
+    display_label: XMPro Subscription Manager Installation Directory
+    description: >
+      Directory on the newly created Windows Virtual Machine
+      for XMPro Subscription Manager that stores the installation files.
+    default:
+      concat:
+        - 'C:\Users\'
+        - { get_input: sm_vm_user_name }
+        - '\XMPro_Subscription_Manager'
+
+  sm_artifacts_urls:
+    type: string
+    hidden: true
+    display_label: SM Artifacts URLs
+    description: >
+      URLs of all artifacts for internet_connected and airgapped
+      installation.
+    default:
+      openssl: *openssl_url
+      ms_edge: *ms_edge_url
+
+  openssl_filenames:
+    type: string
+    hidden: true
+    display_label: OpenSSL Filenames
+    description: >
+      OpenSSL filenames for airgapped and internet_connected installation
+    default: *openssl_filename
+
+  subscription_manager_zip_filename:
+    type: string
+    hidden: true
+    display_label: XMPro Subscription Manager Installer File Name
+    description: XMPro Subscription Manager Installer File Name
+    default: *subscription_manager_zip_filename
+
+  subscription_manager_zip_url:
+    type: string
+    hidden: true
+    display_label: XMPro Subscription Manager Installer URL
+    description: XMPro Subscription Manager Installer URL
+    default: *subscription_manager_zip_url
+
+  openssl_filename:
+    type: string
+    hidden: true
+    display_label: OpenSSL Light Win64 MSI File Name
+    description: OpenSSL Light Win64 MSI File Name
+    default:
+      get_input:
+        - openssl_filenames
+        - { get_input: environment_type }
+
+  openssl_url:
+    type: string
+    hidden: true
+    display_label: OpenSSL Light Win64 MSI File URL
+    description: OpenSSL Light Win64 MSI File URL
+    default:
+      get_input:
+        - sm_artifacts_urls
+        - openssl
+        - { get_input: environment_type }
+
+  ms_edge_filename:
+    type: string
+    hidden: true
+    display_label: Microsoft Edge Installer File Name
+    description: Microsoft Edge Installer File Name
+    default: *ms_edge_filename
+
+  ms_edge_url:
+    type: string
+    hidden: true
+    display_label: Microsoft Edge Installer File URL
+    description: Microsoft Edge Installer File URL
+    default:
+      get_input:
+        - sm_artifacts_urls
+        - ms_edge
+        - { get_input: environment_type }

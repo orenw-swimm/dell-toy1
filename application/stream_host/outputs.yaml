@@ -1,0 +1,28 @@
+capabilities:
+
+# Stream Host VM
+
+  stream_host_vm_host:
+    description: Stream Host Virtual Machine Host
+    value:
+      get_attribute: [stream_host_vm, capabilities, vm_host]
+
+  stream_host_vm_ip:
+    description: Stream Host Virtual Machine IP Address
+    value:
+      get_attribute: [stream_host_vm, capabilities, vm_public_ip]
+
+  stream_host_vm_name:
+    description: Stream Host Virtual Machine Name
+    value:
+      get_attribute: [stream_host_vm, capabilities, vm_name]
+
+  stream_host_vm_user_name:
+    description: Stream Host Virtual Machine User Name
+    value:
+      get_attribute: [stream_host_vm, capabilities, vm_username]
+
+  stream_host_vm_user_password_secret_name:
+    description: Stream Host Virtual Machine User Password Secret Name
+    value:
+      get_input: vm_password_secret_name

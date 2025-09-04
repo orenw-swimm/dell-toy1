@@ -1,0 +1,367 @@
+inputs:
+
+  ad_hostname:
+    type: string
+    hidden: true
+    allow_update: false
+    display_label: Application Designer Hostname
+    description: |
+      Hostname of the Virtual Machine
+      (an auto-generated suffix will also be added).
+      Cannot contain characters other than:
+      letters (a-z, A-Z), numbers (0-9), or hyphens (-).
+      Can be up to 63 characters long.
+    default:
+      concat:
+      - get_input: hostname_prefix
+      - AD
+
+  ad_vm_user_name:
+    type: string
+    hidden: true
+    allow_update: false
+    display_label: Application Designer Deployment User
+    description: |
+      Name of deployment user in the Virtual Machine template in vSphere.
+      Cannot contain leading or trailing spaces.
+    default:
+      get_input: vm_user_name
+
+  ad_vm_password_secret_name:
+    type: secret_key
+    hidden: false
+    allow_update: false
+    display_label: Application Designer Virtual Machine Password Secret Name
+    description: |
+      Secret name containing the user password for
+      the Windows Virtual Machine.
+    constraints:
+    - type: password
+    display:
+      group: vsphere_ad
+      index: 300
+
+  ad_allowed_esxi_host:
+    type: list
+    item_type: string
+    hidden: false
+    allow_update: false
+    display_label: Application Designer ESXi Hostnames
+    description: |
+      Names of the ESXi hosts on which the Virtual Machine should be placed.
+      Mandatory for USB passthrough.
+      Example: [node--01.example.local, node--02.example.local]
+    display:
+      group: vsphere_ad
+      index: 305
+    required: false
+    default: []
+
+  ad_vcpus:
+    type: integer
+    hidden: false
+    allow_update: true
+    display_label: Application Designer vCPUs
+    description: |
+      Number of virtual CPUs allocated to the Virtual Machine.
+      See https://documentation.xmpro.com/resources/sizing-guideline
+      for recommendations.
+    default: 4
+    constraints:
+    - greater_or_equal: 2
+    display:
+      group: vsphere_ad
+      index: 310
+
+  ad_memory_size:
+    type: integer
+    hidden: false
+    allow_update: true
+    display_label: Application Designer Memory Size
+    description: |
+      Memory (in MB) allocated to the Virtual Machine.
+      See https://documentation.xmpro.com/resources/sizing-guideline
+      for recommendations.
+    default: 16384
+    constraints:
+    - greater_or_equal: 8192
+    display:
+      group: vsphere_ad
+      index: 315
+
+  ad_os_disk_size:
+    type: integer
+    hidden: false
+    allow_update: true
+    display_label: Application Designer OS Disk Size
+    description: |
+      Main OS disk size in GB.
+      See https://documentation.xmpro.com/resources/sizing-guideline
+      for recommendations.
+    default: 40
+    constraints:
+    - greater_or_equal: 30
+    display:
+      group: vsphere_ad
+      index: 320
+
+  ad_network_mappings:
+    type: dell.datatypes.vsphere.NetworkMappings
+    hidden: true
+    allow_update: false
+    display_label: Application Designer Network Mappings
+    description: |
+      Array of key-value details for the OVF network setup.
+      See blueprint documentation for more details on the correct
+      formatting for this option.
+    required: true
+    display:
+      group: network
+      index: 7
+    default:
+      dns_servers:
+        get_input: dns
+      connect_networks:
+      - name:
+          get_input:
+          - network
+          - name
+        switch_distributed:
+          get_input:
+          - network
+          - switch_distributed
+        management:
+          get_input:
+          - network
+          - management
+        external:
+          get_input:
+          - network
+          - external
+        use_dhcp:
+          get_input: dhcp
+        network:
+          get_input: cidr
+        gateway:
+          get_input: gateway
+        ip:
+          get_input: ad_static_ip
+
+  ad_static_ip:
+    type: string
+    hidden: false
+    exclusive_with: dhcp
+    allow_update: false
+    display_label: Application Designer Static IP
+    description: |
+      IP address. Example: 172.16.0.1.
+      Only required for static IP deployments, not for DHCP.
+    required: true
+    display:
+      group: vsphere_ad
+      index: 325
+    constraints:
+    - pattern: ^(?:((25[0-5]|2[0-4]\d|1\d\d|\d{1,2})(\.(25[0-5]|2[0-4]\d|1\d\d|\d{1,2})){3}))$
+      error_message: |
+        Invalid format for IP Address.
+        Example: 172.16.0.1
+
+  ad_pci_devices:
+    type: list
+    item_type: dell.datatypes.vsphere.PCIDevice
+    hidden: true
+    allow_update: false
+    display_label: Application Designer PCI Devices
+    description: |
+      List of PCI Devices that will be created and attached
+      to the Virtual Machine.
+      See blueprint documentation for more details on the correct
+      formatting for this option.
+    required: false
+    default: []
+
+  ad_usb_devices:
+    type: list
+    item_type: dell.datatypes.vsphere.USBDevice
+    hidden: true
+    allow_update: false
+    display_label: Application Designer USB Devices
+    description: |
+      List of USB Devices that will be created and attached
+      to the Virtual Machine.
+      See blueprint documentation for more details on the correct
+      formatting for this option.
+    required: false
+    default: []
+
+  ad_serial_ports:
+    type: list
+    item_type: dell.datatypes.vsphere.SerialPort
+    hidden: true
+    allow_update: false
+    display_label: Application Designer Serial Ports
+    description: |
+      A list of serial ports to pass through to the Virtual Machine.
+      See blueprint documentation for more details on the correct
+      formatting for this option.
+    required: false
+    default: []
+
+  ad_nics_device_list:
+    type: list
+    item_type: dell.datatypes.vsphere.NIC
+    hidden: true
+    allow_update: false
+    display_label: Application Designer NICs Devices
+    description: |
+      List of NIC Devices that will be created and attached
+      to the Virtual Machine.
+      See blueprint documentation for more details on the correct
+      formatting for this option.
+    default: []
+
+data_types:
+
+  dell.datatypes.vsphere.USBDevice:
+    properties:
+      device_name:
+        type: string
+        description: Host USB Device Name
+        required: true
+      controller_type:
+        type: string
+        description: |
+          USB Controller type associated with USB.
+          Values can be: usb2, usb3
+        required: false
+        default: usb3
+
+  dell.datatypes.vsphere.SerialPort:
+    properties:
+      device_name:
+        type: string
+        description: |
+          Host Serial Port Name.
+          Should be an absolute path: /dev/char/serial/uartX
+        required: true
+
+  dell.datatypes.vsphere.PCIDevice:
+    properties:
+      device_name:
+        type: string
+        description: PCI Passthrough Device Name
+        required: true
+
+  dell.datatypes.vsphere.NIC:
+    properties:
+      network_name:
+        type: string
+        description: |
+          Name of the network to be connected.
+      external_network_distributed:
+        type: boolean
+        description: |
+          Determines if this is connected to a distributed port group.
+        default: false
+      adapter_type:
+        type: string
+        description: |
+          Type of the adapter. Possible values: Vmxnet3, Vmxnet2, Sriov, E1000, E1000e
+        default: Vmxnet3
+      network_management:
+        type: boolean
+        description: |
+          Determines if this is a management network.
+        default: true
+      external_network:
+        type: boolean
+        description: |
+          Determines if this is an external network.
+        default: true
+      dhcp_network:
+        type: boolean
+        description: |
+          Determines if IP address should be fetched from DHCP server.
+        default: false
+      network_cidr:
+        type: string
+        description: |
+          Address of the network in CIDR format e.g. 192.168.0.1/24
+        default: ''
+        required: false
+      gateway:
+        type: string
+        description: |
+          IP address of the default gateway.
+        required: false
+      ip:
+        type: string
+        description: |
+          Static IP address to be set for this network interface.
+        required: false
+
+  dell.datatypes.vsphere.NetworkMappings:
+    properties:
+      domain:
+        type: string
+        description: |
+          Name of the domain.
+        required: false
+      dns_servers:
+        type: list
+        description: |
+          List of DNS servers.
+        required: false
+      connect_networks:
+        type: list
+        description: |
+          List of networks to be connected.
+        required: false
+
+  dell.datatypes.vsphere.ConnectNetwork:
+    properties:
+      name:
+        type: string
+        description: |
+          Name of the network to be connected.
+      switch_distributed:
+        type: boolean
+        description: |
+          Determines if this is connected to a distributed port group.
+        default: false
+      management:
+        type: boolean
+        description: |
+          Determines if this is a management network.
+        default: false
+      external:
+        type: boolean
+        description: |
+          Determines if this is an external network.
+        default: false
+      nsx_t_switch:
+        type: boolean
+        description: |
+          Determines if this is connected to a NSX-T Logical Switch.
+        default: false
+      use_dhcp:
+        type: boolean
+        description: |
+          Determines if IP address should be fetched from DHCP server.
+        default: true
+      network:
+        type: string
+        description: |
+          Address of the network in CIDR format e.g. 192.168.0.1/24
+        default: ''
+        required: false
+      gateway:
+        type: string
+        description: |
+          IP address of the default gateway.
+        required: false
+      ip:
+        type: string
+        description: |
+          Static IP address to be set for this network interface.
+        required: false

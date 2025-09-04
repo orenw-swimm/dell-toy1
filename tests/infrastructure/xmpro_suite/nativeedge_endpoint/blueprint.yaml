@@ -1,0 +1,32 @@
+imports:
+  - plugin:edge-plugin
+
+node_templates:
+
+  binary_image:
+    type: dell.nodes.ApplicationModule
+    interfaces:
+      dell.interfaces.lifecycle:
+        start:
+          implementation: tests/utilities/set_runtime_properties.py
+          executor: central_deployment_agent
+          inputs:
+            binary_details:
+              extra:
+                artifact_id: 00000000-aaaa-bbbb-cccc-999999999999
+        poststart:
+          implementation: tests/utilities/verify_inputs.py
+          executor: central_deployment_agent
+          inputs:
+            path:
+              get_input: binary_image_artifact_url
+            username:
+              get_input: binary_image_artifact_username
+            access_token:
+              get_secret:
+                get_input: binary_image_artifact_access_token_secret_name
+            version:
+              get_input: binary_image_version
+    relationships:
+      - type: dell.relationships.depends_on
+        target: validate_secrets

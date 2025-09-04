@@ -1,0 +1,13 @@
+---
+- name: Download a file from URL info
+  ansible.builtin.debug:
+    msg: "Downloading a file from URL: {{ artifact_url }}"
+
+- name: Download a file
+  ansible.windows.win_get_url:
+    url: "{{ artifact_url }}"
+    validate_certs: "{{ artifact_validate_certs }}"
+    headers: "{{ artifact_headers }}"
+    dest: "{{ artifact_target_path }}"
+  become: true
+  register: download_result

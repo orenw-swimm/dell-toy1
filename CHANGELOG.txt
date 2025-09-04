@@ -1,0 +1,47 @@
+2.0.0.3:
+  - ticket: NE03A-776
+    developer: Jaroslaw-Rzeszutek
+    description: Allow to edit vm name
+    
+2.0.0.2:
+  - ticket: NE03A-730
+    developer: michal-pawlowski
+    description: Align to new ansible executor schema
+
+2.0.0.1:
+  - ticket: NE03A-599
+    developer: Jakub-Cierlik
+    description: revision_id in ServiceComponents
+
+2.0.0.0:
+  - ticket: NE03A-543,NE03A-542
+    developer: Jakub-Cierlik
+    description: Rebrand to Dell types and plugins
+
+1.3.0.3:
+  - ticket: NE03A-495
+    developer: Jakub-Cierlik
+    description: Update XMPro Stream Host Additional Instances optional input
+
+1.3.0.2:
+  - ticket: NE-59526
+    developer: Jakub-Cierlik
+    description: Remove default value of the OpenSSL URL input
+
+1.3.0.1:
+  - ticket: NE-59288
+    developer: mateusz-mizerski
+    description: Fix secret validation
+
+1.3.0.0:
+  - ticket: NE03D-83
+    developer: bilna-p
+    description: Applied secret types
+  - ticket: ne-46922
+    developer: michal-pawlowski
+    description: Added Input groups
+
+1.2.0.1
+  - ticket: ne-50598
+    developer: Krzysztof-Frukacz
+    description: Align public catalog

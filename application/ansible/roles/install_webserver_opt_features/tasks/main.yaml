@@ -1,0 +1,56 @@
+---
+- name: Check If All Windows Features Are Installed
+  ansible.windows.win_stat:
+    path: "{{ installation_dir }}\\InstalledWindowsFeatures.txt"
+  register: installed_windows_features
+  changed_when: not installed_windows_features.stat.exists
+  retries: 15
+  delay: 60
+  until: installed_windows_features.stat.exists
+
+- name: Install IIS Optional Features
+  ansible.windows.win_shell: |
+    $featureNames = @(
+      "IIS-WebServer",
+      "IIS-WebServerRole",
+      "IIS-CommonHttpFeatures",
+      "IIS-HealthAndDiagnostics",
+      "IIS-Performance",
+      "IIS-Security",
+      "IIS-ApplicationDevelopment",
+      "IIS-NetFxExtensibility",
+      "IIS-NetFxExtensibility45",
+      "IIS-ApplicationInit",
+      "IIS-ASPNET",
+      "IIS-ASPNET45",
+      "IIS-ASP",
+      "IIS-ISAPIExtensions",
+      "IIS-ISAPIFilter",
+      "IIS-ServerSideIncludes",
+      "IIS-WebSockets",
+      "IIS-WebServerManagementTools",
+      "IIS-ManagementConsole"
+    )
+    $scriptBlock = {
+      param($features)
+      foreach ($feature in $features) {
+        $cmd = "Enable-WindowsOptionalFeature -Online -FeatureName $feature | Out-Null"
+        if ($feature -eq "IIS-NetFxExtensibility" -or `
+            $feature -eq "IIS-NetFxExtensibility45" -or `
+            $feature -eq "IIS-ASPNET" -or `
+            $feature -eq "IIS-ASPNET45") {
+              $cmd += " -All"
+        }
+        Invoke-Expression $cmd
+      }
+      $features | Out-File `
+        -FilePath "{{ installation_dir }}\InstalledWindowsOptionalFeatures.txt"
+    }
+    $job = Start-Job -ScriptBlock $scriptBlock -ArgumentList (,$featureNames)
+    $outputPath = "{{ installation_dir }}\InstalledWindowsOptionalFeatures.txt"
+    while (-not (Test-Path -Path $outputPath)) {
+      Write-Host "Waiting for Windows Optional Features installation to finish..."
+      Start-Sleep -Seconds 60
+    }
+    Write-Host "Windows Optional Features installed successfully"
+  become: true

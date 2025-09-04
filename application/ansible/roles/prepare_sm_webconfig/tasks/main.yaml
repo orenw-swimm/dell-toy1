@@ -1,0 +1,64 @@
+---
+- name: Set Sensitive Variables Facts
+  ansible.builtin.set_fact:
+    xmpro_password: "{{ xmpro_password }}"
+    smtp_password: "{{ smtp_password }}"
+  no_log: "{{ censor_sensitive_data }}"
+
+- name: Prepare Subscription Manager WebConfig File
+  ansible.windows.win_shell: |
+    $filePath = "{{ webconfig_path }}"
+    $content = Get-Content -Path $filePath -Raw
+    $signingCertName = "{{ signing_cert_name }}"
+    $hostname = hostname
+    $hostnameLowerCase = $hostname.ToLower()
+    $targetServerName = "{{ sql_ip }}"
+    $targetUser = "XMProUser"
+    $targetPassword = "{{ xmpro_password }}"
+    $smConnectionString = `
+      "Data Source=tcp:{0};Initial Catalog=SM;User ID={1};Password={2}" `
+      -f $targetServerName, $targetUser, $targetPassword
+    $guid = [guid]::NewGuid()
+    $replaceStrings = @{
+      '<xmpro configBuilders="AzureKeyVault">' = '<xmpro>'
+      'CurrentUser' = 'LocalMachine'
+      '${SQLSERVER}' = "$smConnectionString"
+      '${CERT}' = "CN=$signingCertName"
+      '${SALT}' = "$guid"
+      '${DNSName}' = "https://$hostnameLowerCase/"
+      '${ServerUUID}' = '{{ sm_product_id }}'
+      '${AutoScaleEnable}' = '{{ redis_autoscale_enable }}'
+      '${SMTPENABLE}' = '{{ smtp_enable }}'
+      '${SMTPSERVER}' = '{{ smtp_server }}'
+      '${SMTPENABLESSL}' = '{{ smtp_enable_ssl }}'
+      '${SMTPPORT}' = '{{ smtp_port }}'
+      '${SMTPUSER}' = '{{ smtp_user }}'
+      '${SMTPPASS}' = '{{ smtp_password }}'
+      '${SMTPFrom}' = '{{ smtp_from_address }}'
+    }
+    foreach ($oldString in $replaceStrings.Keys) {
+      $newString = $replaceStrings[$oldString]
+      $content = $content -replace [regex]::Escape($oldString), $newString
+    }
+    $content | Set-Content -Path $filePath
+  become: true
+  ignore_errors: true
+  no_log: "{{ censor_sensitive_data }}"
+  register: prepare_webconfig_result
+
+- name: Print Stdout From Prepare Subscription Manager WebConfig File
+  ansible.builtin.debug:
+    msg: '{{ prepare_webconfig_result.stdout | replace(xmpro_password, "*****") | replace(smtp_password, "*****") }}'
+  when: prepare_webconfig_result is failed
+
+- name: Print Stderr From Prepare Subscription Manager WebConfig File
+  ansible.builtin.debug:
+    msg: '{{ prepare_webconfig_result.stderr | replace(xmpro_password, "*****") | replace(smtp_password, "*****") }}'
+  when: prepare_webconfig_result is failed
+
+- name: Error in Prepare Subscription Manager WebConfig File
+  ansible.builtin.fail:
+    msg: >
+      Prepare Subscription Manager WebConfig File failed.
+      Please see the error messages above.
+  when: prepare_webconfig_result is failed

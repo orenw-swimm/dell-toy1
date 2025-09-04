@@ -1,0 +1,164 @@
+tosca_definitions_version: dell_1_0
+
+description: >
+  Creates Windows Virtual Machines on NativeEdge Endpoint and installs XMPro Software.
+
+imports:
+  - dell/types/types.yaml
+
+  # Infrastructure - NativeEdge Endpoint
+  - infrastructure/xmpro_suite/nativeedge_endpoint/inputs.yaml
+  - infrastructure/xmpro_suite/nativeedge_endpoint/components/mssql_server/inputs.yaml
+  - infrastructure/xmpro_suite/nativeedge_endpoint/components/subscription_manager/inputs.yaml
+  - infrastructure/xmpro_suite/nativeedge_endpoint/components/application_designer/inputs.yaml
+  - infrastructure/xmpro_suite/nativeedge_endpoint/components/data_stream_designer/inputs.yaml
+
+  - infrastructure/xmpro_suite/nativeedge_endpoint/blueprint.yaml
+  - infrastructure/xmpro_suite/nativeedge_endpoint/components/mssql_server/blueprint.yaml
+  - infrastructure/xmpro_suite/nativeedge_endpoint/components/subscription_manager/blueprint.yaml
+  - infrastructure/xmpro_suite/nativeedge_endpoint/components/application_designer/blueprint.yaml
+  - infrastructure/xmpro_suite/nativeedge_endpoint/components/data_stream_designer/blueprint.yaml
+
+  # Application - XMPro Suite
+  - application/inputs.yaml
+  - application/inputs_common.yaml
+  - application/mssql_server/inputs.yaml
+  - application/subscription_manager/inputs.yaml
+  - application/application_designer/inputs.yaml
+  - application/data_stream_designer/inputs.yaml
+
+  - application/blueprint.yaml
+  - application/mssql_server/blueprint.yaml
+  - application/subscription_manager/blueprint.yaml
+  - application/application_designer/blueprint.yaml
+  - application/data_stream_designer/blueprint.yaml
+
+  # Outputs
+  - application/outputs.yaml
+  - application/subscription_manager/outputs.yaml
+  - application/application_designer/outputs.yaml
+  - application/data_stream_designer/outputs.yaml
+  - application/mssql_server/outputs.yaml
+
+input_groups:
+  ned:
+    display_label: Common Inputs for Virtual Machines
+    collapsible: true
+    index: 0
+    inputs:
+      - hostname_prefix
+      - os_type
+      - segment_name
+      - dhcp
+      - dns
+      - gateway
+  ned_mssql:
+    display_label: Microsoft SQL Server Virtual Machine
+    collapsible: true
+    index: 1
+    inputs:
+      - db_vm_user_name
+      - db_vm_password_secret_name
+      - db_vcpus
+      - db_memory_size
+      - db_os_disk_size
+      - db_disk
+      - db_static_ip
+  ned_sm:
+    display_label: Subscription Manager Virtual Machine
+    collapsible: true
+    index: 2
+    inputs:
+      - sm_vm_user_name
+      - sm_vm_password_secret_name
+      - sm_vcpus
+      - sm_memory_size
+      - sm_os_disk_size
+      - sm_disk
+      - sm_static_ip
+  ned_ad:
+    display_label: Application Designer Virtual Machine
+    collapsible: true
+    index: 3
+    inputs:
+      - ad_vm_user_name
+      - ad_vm_password_secret_name
+      - ad_vcpus
+      - ad_memory_size
+      - ad_os_disk_size
+      - ad_disk
+      - ad_static_ip
+  ned_ds:
+    display_label: Data Stream Designer Virtual Machine
+    collapsible: true
+    index: 4
+    inputs:
+      - ds_vm_user_name
+      - ds_vm_password_secret_name
+      - ds_vcpus
+      - ds_memory_size
+      - ds_os_disk_size
+      - ds_disk
+      - ds_static_ip
+  xmpro:
+    display_label: XMPro Suite Inputs
+    collapsible: true
+    index: 5
+    inputs:
+      - artifact_configuration_secret_name
+      - win_get_url_validate_certs
+      - environment_type
+      - company_name
+      - first_name
+      - last_name
+      - email
+      - company_admin_password_secret_name
+      - site_admin_password_secret_name
+  xmpro_smtp:
+    display_label: XMPro Suite SMTP
+    collapsible: true
+    index: 6
+    inputs:
+      - smtp_enable
+      - smtp_server
+      - smtp_port
+      - smtp_user
+      - smtp_password_secret_name
+      - smtp_enable_ssl
+      - smtp_from_address
+  xmpro_mssql:
+    display_label: Microsoft SQL Server
+    collapsible: true
+    index: 7
+    inputs:
+      - mssql_server_version
+  xmpro_sm:
+    display_label: Subscription Manager
+    collapsible: true
+    index: 8
+    inputs:
+      - openssl_url_internet_connected
+
+labels:
+  csys-obj-type:
+    values:
+      - environment
+  target_environment:
+    values:
+      - ned
+  vendor:
+    values:
+      - xmpro
+  solution:
+    values:
+      - subscription_manager
+      - application_designer
+      - data_stream_designer
+  version:
+    values:
+      - "4.3.7.0"
+
+blueprint_labels:
+  env:
+    values:
+      - NED

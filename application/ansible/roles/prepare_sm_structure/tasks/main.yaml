@@ -1,0 +1,10 @@
+---
+- name: Copy Subscription Manager Website Content
+  win_shell: >
+    robocopy
+    {{ initial_sm_content }}\{{ zip_internal_path }}
+    {{ website_directory }} /E
+  args:
+    executable: cmd
+  register: robocopy_result
+  failed_when: robocopy_result.rc > 1

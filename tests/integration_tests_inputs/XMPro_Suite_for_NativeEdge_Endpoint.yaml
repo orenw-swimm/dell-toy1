@@ -1,0 +1,50 @@
+# Infrastructure - NativeEdge Endpoint Windows Virtual Machines
+
+hostname_prefix: XMPro
+os_type: WIN2019-SERVER
+segment_name: BRIDGED
+dhcp: true
+db_vm_user_name: Administrator
+db_vm_password_secret_name: xmpro_int_win_vm_password
+db_vcpus: 8
+db_memory_size: 8GB
+db_os_disk_size: 150GB
+db_disk: /DataStore0
+sm_vm_user_name: Administrator
+sm_vm_password_secret_name: xmpro_int_win_vm_password
+sm_vcpus: 8
+sm_memory_size: 8GB
+sm_os_disk_size: 150GB
+sm_disk: /DataStore0
+ad_vm_user_name: Administrator
+ad_vm_password_secret_name: xmpro_int_win_vm_password
+ad_vcpus: 8
+ad_memory_size: 16GB
+ad_os_disk_size: 150GB
+ad_disk: /DataStore0
+ds_vm_user_name: Administrator
+ds_vm_password_secret_name: xmpro_int_win_vm_password
+ds_vcpus: 8
+ds_memory_size: 16GB
+ds_os_disk_size: 150GB
+ds_disk: /DataStore0
+
+# Application - XMPro Suite on Windows
+
+company_name: IntegrationTest
+first_name: John
+last_name: Smith
+email: John.Smith@dell.com
+company_admin_password_secret_name: xmpro_int_admin_password
+site_admin_password_secret_name: xmpro_int_admin_password
+smtp_enable: true
+smtp_server: 172.20.7.176
+smtp_port: 1025
+smtp_user: ""
+smtp_password_secret_name: xmpro_int_smtp_password
+smtp_enable_ssl: false
+smtp_from_address: noreply@dell.com
+artifact_configuration_secret_name: xmpro_artifact_configuration
+win_get_url_validate_certs: false
+environment_type: airgapped
+mssql_server_version: SQLServer2022

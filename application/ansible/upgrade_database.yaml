@@ -1,0 +1,21 @@
+---
+- name: Upgrade XMPro MS SQL Database
+  hosts: win
+  become_method: runas
+  become_user: "{{ vm_user_name | default('Administrator') }}"
+  gather_facts: false
+  roles:
+  - role: upgrade_database
+    vars:
+      installation_dir: "{{ installation_dir }}"
+      xmpro_password: "{{ xmpro_password }}"
+      ds_url: "{{ ds_url }}"
+      ad_url: "{{ ad_url }}"
+      company_name: "{{ company_name }}"
+      first_name: "{{ first_name }}"
+      last_name: "{{ last_name }}"
+      email: "{{ email }}"
+      company_admin_password: "{{ company_admin_password }}"
+      site_admin_password: "{{ site_admin_password }}"
+      node_instance_id: "{{ node_instance_id }}"
+      censor_sensitive_data: "{{ censor_sensitive_data }}"

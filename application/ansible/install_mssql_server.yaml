@@ -1,0 +1,93 @@
+---
+- name: Install MSSQL Server
+  hosts: win
+  become_method: runas
+  become_user: "{{ vm_user_name | default('Administrator') }}"
+  gather_facts: false
+  tasks:
+  - name: Make sure the Drive is unmounted
+    win_disk_image:
+      image_path: "{{ installation_dir }}\\{{ iso_filename }}"
+      state: absent
+    ignore_errors: true
+
+  - name: Prepare Environment
+    include_role:
+      name: prepare_environment
+    vars:
+      installation_dir: "{{ installation_dir }}"
+
+  - name: Download MS SQL ISO {{ iso_filename }}
+    include_role:
+      name: download_file
+    vars:
+      artifact_url: "{{ iso_download_url }}"
+      artifact_validate_certs: "{{ artifact_validate_certs }}"
+      artifact_headers: "{{ artifact_headers }}"
+      artifact_target_path: "{{ installation_dir }}\\{{ iso_filename }}"
+      censor_sensitive_data: "{{ censor_sensitive_data }}"
+
+  - name: Download Subscription Manager DB Migrations File
+    include_role:
+      name: download_file
+    vars:
+      artifact_url: "{{ sm_db_migrations_url }}"
+      artifact_validate_certs: "{{ artifact_validate_certs }}"
+      artifact_headers: "{{ artifact_headers }}"
+      artifact_target_path: "{{ installation_dir }}\\{{ sm_db_migrations_filename }}"
+      censor_sensitive_data: "{{ censor_sensitive_data }}"
+
+  - name: Download Data Stream Designer DB Migrations File
+    include_role:
+      name: download_file
+    vars:
+      artifact_url: "{{ ds_db_migrations_url }}"
+      artifact_validate_certs: "{{ artifact_validate_certs }}"
+      artifact_headers: "{{ artifact_headers }}"
+      artifact_target_path: "{{ installation_dir }}\\{{ ds_db_migrations_filename }}"
+      censor_sensitive_data: "{{ censor_sensitive_data }}"
+
+  - name: Download Application Designer DB Migrations File
+    include_role:
+      name: download_file
+    vars:
+      artifact_url: "{{ ad_db_migrations_url }}"
+      artifact_validate_certs: "{{ artifact_validate_certs }}"
+      artifact_headers: "{{ artifact_headers }}"
+      artifact_target_path: "{{ installation_dir }}\\{{ ad_db_migrations_filename }}"
+      censor_sensitive_data: "{{ censor_sensitive_data }}"
+
+  - name: Download UpgradeDatabase PowerShell Script
+    include_role:
+      name: copy_file
+    vars:
+      file_source_path: resources/UpgradeDatabase.ps1
+      file_target_path: "{{ installation_dir }}\\UpgradeDatabase.ps1"
+
+  - name: Install MS {{ mssql_server_version }}
+    include_role:
+      name: install_mssql
+    vars:
+      installation_dir: "{{ installation_dir }}"
+      iso_filename: "{{ iso_filename }}"
+      mssql_server_version: "{{ mssql_server_version }}"
+
+  - name: Reboot VM
+    include_role:
+      name: reboot_machine
+
+  - name: Open Port
+    include_role:
+      name: open_port
+    vars:
+      rule_name: MSSQL
+      localport: "{{ db_port | default(1433) }}"
+      protocol: tcp
+
+  - name: Configure MS {{ mssql_server_version }} Mode
+    include_role:
+      name: configure_mssql_mode
+    vars:
+      sa_password: "{{ sa_password }}"
+      xmpro_password: "{{ xmpro_password }}"
+      censor_sensitive_data: "{{ censor_sensitive_data }}"

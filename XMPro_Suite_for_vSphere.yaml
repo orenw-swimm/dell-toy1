@@ -1,0 +1,166 @@
+tosca_definitions_version: dell_1_0
+
+description: >
+  Creates Windows Virtual Machines in vSphere environment and installs
+  XMPro Software.
+
+imports:
+  - dell/types/types.yaml
+
+  # Infrastructure - vSphere VM
+  - infrastructure/xmpro_suite/vsphere/inputs.yaml
+  - infrastructure/xmpro_suite/vsphere/components/mssql_server/inputs.yaml
+  - infrastructure/xmpro_suite/vsphere/components/subscription_manager/inputs.yaml
+  - infrastructure/xmpro_suite/vsphere/components/application_designer/inputs.yaml
+  - infrastructure/xmpro_suite/vsphere/components/data_stream_designer/inputs.yaml
+
+  - infrastructure/xmpro_suite/vsphere/components/mssql_server/blueprint.yaml
+  - infrastructure/xmpro_suite/vsphere/components/subscription_manager/blueprint.yaml
+  - infrastructure/xmpro_suite/vsphere/components/application_designer/blueprint.yaml
+  - infrastructure/xmpro_suite/vsphere/components/data_stream_designer/blueprint.yaml
+
+  # Application - XMPro Suite
+  - application/inputs.yaml
+  - application/inputs_common.yaml
+  - application/mssql_server/inputs.yaml
+  - application/subscription_manager/inputs.yaml
+  - application/application_designer/inputs.yaml
+  - application/data_stream_designer/inputs.yaml
+
+  - application/blueprint.yaml
+  - application/mssql_server/blueprint.yaml
+  - application/subscription_manager/blueprint.yaml
+  - application/application_designer/blueprint.yaml
+  - application/data_stream_designer/blueprint.yaml
+
+  # Outputs
+  - application/outputs.yaml
+  - application/subscription_manager/outputs.yaml
+  - application/application_designer/outputs.yaml
+  - application/data_stream_designer/outputs.yaml
+  - application/mssql_server/outputs.yaml
+
+input_groups:
+  vsphere:
+    display_label: Common Inputs for vSphere  Virtual Machines
+    collapsible: true
+    index: 0
+    inputs:
+      - vm_template
+      - hostname_prefix
+      - vm_user_name
+      - datastore_name
+      - resource_pool_name
+      - vm_folder
+      - disk_provisioning
+      - network
+      - dhcp
+      - cidr
+      - gateway
+      - dns
+  vsphere_mssql:
+    display_label: Microsoft SQL Server Virtual Machine
+    collapsible: true
+    index: 1
+    inputs:
+      - db_vm_password_secret_name
+      - db_allowed_esxi_host
+      - db_vcpus
+      - db_memory_size
+      - db_os_disk_size
+      - db_static_ip
+  vsphere_sm:
+    display_label: Subscription Manager Virtual Machine
+    collapsible: true
+    index: 2
+    inputs:
+      - sm_vm_password_secret_name
+      - sm_allowed_esxi_host
+      - sm_vcpus
+      - sm_memory_size
+      - sm_os_disk_size
+      - sm_static_ip
+  vsphere_ad:
+    display_label: Application Designer Virtual Machine
+    collapsible: true
+    index: 3
+    inputs:
+      - ad_vm_password_secret_name
+      - ad_allowed_esxi_host
+      - ad_vcpus
+      - ad_memory_size
+      - ad_os_disk_size
+      - ad_static_ip
+  vsphere_ds:
+    display_label: Data Stream Designer Virtual Machine
+    collapsible: true
+    index: 4
+    inputs:
+      - ds_vm_password_secret_name
+      - ds_allowed_esxi_host
+      - ds_vcpus
+      - ds_memory_size
+      - ds_os_disk_size
+      - ds_static_ip
+  xmpro:
+    display_label: XMPro Suite Inputs
+    collapsible: true
+    index: 5
+    inputs:
+      - artifact_configuration_secret_name
+      - win_get_url_validate_certs
+      - environment_type
+      - company_name
+      - first_name
+      - last_name
+      - email
+      - company_admin_password_secret_name
+      - site_admin_password_secret_name
+  xmpro_smtp:
+    display_label: XMPro Suite SMTP
+    collapsible: true
+    index: 6
+    inputs:
+      - smtp_enable
+      - smtp_server
+      - smtp_port
+      - smtp_user
+      - smtp_password_secret_name
+      - smtp_enable_ssl
+      - smtp_from_address
+  xmpro_mssql:
+    display_label: Microsoft SQL Server
+    collapsible: true
+    index: 7
+    inputs:
+      - mssql_server_version
+  xmpro_sm:
+    display_label: Subscription Manager
+    collapsible: true
+    index: 8
+    inputs:
+      - openssl_url_internet_connected
+
+labels:
+  csys-obj-type:
+    values:
+      - environment
+  target_environment:
+    values:
+      - vsphere
+  vendor:
+    values:
+      - xmpro
+  solution:
+    values:
+      - subscription_manager
+      - application_designer
+      - data_stream_designer
+  version:
+    values:
+      - "4.3.7.0"
+
+blueprint_labels:
+  env:
+    values:
+      - vsphere

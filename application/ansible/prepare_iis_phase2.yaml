@@ -1,0 +1,10 @@
+---
+- name: Create Initial IIS Website - Phase 2
+  hosts: win
+  become_method: runas
+  become_user: "{{ vm_user_name | default('Administrator') }}"
+  gather_facts: false
+  roles:
+  - role: install_webserver_opt_features
+    vars:
+      installation_dir: "{{ installation_dir }}"

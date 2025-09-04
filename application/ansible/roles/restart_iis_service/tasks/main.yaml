@@ -1,0 +1,10 @@
+---
+- name: Stop IIS Service
+  win_service:
+    name: "W3SVC"
+    state: stopped
+
+- name: Start IIS Service
+  win_service:
+    name: "W3SVC"
+    state: started

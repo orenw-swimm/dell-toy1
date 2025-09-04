@@ -1,0 +1,28 @@
+capabilities:
+
+# Data Stream Designer VM
+
+  data_stream_designer_vm_ip:
+    description: Data Stream Designer Virtual Machine IP Address
+    value:
+      get_attribute: [data_stream_designer_vm, capabilities, vm_public_ip]
+
+  data_stream_designer_vm_name:
+    description: Data Stream Designer Virtual Machine Name
+    value:
+      get_attribute: [data_stream_designer_vm, capabilities, vm_name]
+
+  data_stream_designer_vm_hostname:
+    description: Data Stream Designer Virtual Machine Hostname
+    value:
+      get_attribute: [get_data_stream_designer_hostname, hostname]
+
+  data_stream_designer_vm_user_name:
+    description: Data Stream Designer Virtual Machine User Name
+    value:
+      get_attribute: [data_stream_designer_vm, capabilities, vm_username]
+
+  data_stream_designer_vm_user_password_secret_name:
+    description: Data Stream Designer Virtual Machine User Password Secret Name
+    value:
+      get_input: ds_vm_password_secret_name

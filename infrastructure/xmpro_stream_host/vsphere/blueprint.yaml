@@ -1,0 +1,62 @@
+node_templates:
+
+  stream_host_vm:
+    type: dell.nodes.ServiceComponent
+    properties:
+      resource_config:
+        blueprint:
+          external_resource: true
+          id: Windows_Virtual_Machine_for_vSphere
+          revision_id: 3.1.1.0
+        deployment:
+          display_name:
+            concat:
+              - { get_sys: [deployment, name] }
+              - "-vm"
+          auto_inc_suffix: true
+          inputs:
+            vsphere_secret_name:
+              get_environment_capability: vcenter_credentials
+            template_name:
+              get_input: vm_template
+            vm_name:
+              get_input: hostname
+            vm_user_name:
+              get_input: vm_user_name
+            vm_password_secret_name:
+              get_input: vm_password_secret_name
+            resource_pool_name:
+              get_input: resource_pool_name
+            vm_folder_name:
+              get_input: vm_folder
+            datastore_name:
+              get_input: datastore_name
+            allowed_esxi_hosts:
+              get_input: allowed_esxi_host
+            vcpu:
+              get_input: vcpus
+            memory_size:
+              get_input: memory_size
+            os_disk_size:
+              get_input: os_disk_size
+            disk_provisioning:
+              get_input: disk_provisioning
+            storage_disk_size:
+              get_input: storage_disk_size
+            disks_count:
+              get_input: disks_count
+            storage_disk_provisioning:
+              get_input: storage_disk_provisioning
+            networking:
+              get_input: network_mappings
+            pci_devices:
+              get_input: pci_devices
+            usb_devices:
+              get_input: usb_devices
+            serial_ports:
+              get_input: serial_ports
+            nics:
+              get_input: nics_device_list
+    relationships:
+      - type: dell.relationships.depends_on
+        target: validate_secrets

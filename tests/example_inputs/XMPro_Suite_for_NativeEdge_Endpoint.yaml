@@ -1,0 +1,50 @@
+# Infrastructure - NativeEdge Endpoint Windows Virtual Machines
+
+os_type: WIN2019-SERVER
+segment_name: BRIDGED
+dhcp: true
+db_vm_user_name: Administrator
+db_vm_password_secret_name: vm_password
+db_vcpus: 4
+db_memory_size: 16GB
+db_os_disk_size: 50GB
+db_disk: /DataStore0
+sm_vm_user_name: Administrator
+sm_vm_password_secret_name: vm_password
+sm_vcpus: 4
+sm_memory_size: 16GB
+sm_os_disk_size: 50GB
+sm_disk: /DataStore0
+ad_vm_user_name: Administrator
+ad_vm_password_secret_name: vm_password
+ad_vcpus: 4
+ad_memory_size: 16GB
+ad_os_disk_size: 50GB
+ad_disk: /DataStore0
+ds_vm_user_name: Administrator
+ds_vm_password_secret_name: vm_password
+ds_vcpus: 4
+ds_memory_size: 16GB
+ds_os_disk_size: 50GB
+ds_disk: /DataStore0
+
+# Application - XMPro Suite on Windows
+
+company_name: mycompany
+first_name: test
+last_name: test
+email: test.test@dell.com
+company_admin_password_secret_name: xmpro_password
+site_admin_password_secret_name: xmpro_password
+smtp_enable: true
+smtp_server: 127.0.0.1
+smtp_port: 587
+smtp_user: test
+smtp_password_secret_name: xmpro_smtp_password
+smtp_enable_ssl: true
+smtp_from_address: test@test.com
+artifact_configuration_secret_name: xmpro_artifact_configuration
+win_get_url_validate_certs: false
+environment_type: internet_connected
+mssql_server_version: SQLServer2022
+openssl_url_internet_connected: https://slproweb.com/download/Win64OpenSSL_Light-3_4_1.msi

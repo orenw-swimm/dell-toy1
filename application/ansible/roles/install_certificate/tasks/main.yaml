@@ -1,0 +1,104 @@
+---
+- name: Create Certificates Directory
+  ansible.windows.win_file:
+    path: "{{ installation_dir }}\\certificates"
+    state: directory
+  become: true
+
+- name: Upload XMPro Signing Cert PFX
+  ansible.windows.win_copy:
+    src: "/opt/manager/resources/deployments/{{ tenant_name }}/{{ deployment_id }}/{{ signing_cert_name }}.pfx"
+    dest: "{{ installation_dir }}\\certificates\\{{ signing_cert_name }}.pfx"
+  become: true
+  when: website_name.endswith('SM')
+
+- name: Import PFX Signing Certificate into Personal Store
+  ansible.windows.win_certificate_store:
+    key_exportable: true
+    key_storage: "machine"
+    path: "{{ installation_dir }}\\certificates\\{{ signing_cert_name }}.pfx"
+    state: present
+    store_location: "LocalMachine"
+    store_name: "My"
+    store_type: "system"
+  register: signcert_thumbprint
+  when: website_name.endswith('SM')
+
+- name: Import PFX Signing Certificate into Root Store
+  ansible.windows.win_certificate_store:
+    key_exportable: true
+    key_storage: "machine"
+    path: "{{ installation_dir }}\\certificates\\{{ signing_cert_name }}.pfx"
+    state: present
+    store_location: "LocalMachine"
+    store_name: "Root"
+    store_type: "system"
+  when: website_name.endswith('SM')
+
+- name: Add IIS User access to the Signing Certificate
+  ansible.windows.win_shell: |
+    $certificateStoreLocation = "Cert:\LocalMachine\My"
+    $certificate = Get-ChildItem $certificateStoreLocation | Where thumbprint -eq {{ signcert_thumbprint.thumbprints[0] }}
+    $rsaCert = [System.Security.Cryptography.X509Certificates.RSACertificateExtensions]::GetRSAPrivateKey($certificate)
+    $fileName = $rsaCert.key.UniqueName
+    $path = "C:\ProgramData\Microsoft\Crypto\RSA\MachineKeys\$fileName"
+    $access_rule = `
+      New-Object System.Security.AccessControl.FileSystemAccessRule( `
+      'IIS_IUSRS', `
+      'Read', `
+      'None', `
+      'None', `
+      'Allow' `
+      )
+    $permissions = Get-Acl -Path "$path"
+    $permissions.AddAccessRule($access_rule)
+    Set-Acl -Path $path -AclObject $permissions
+  become: true
+  when: website_name.endswith('SM')
+
+- name: Upload XMPro Cert PFX
+  ansible.windows.win_copy:
+    src: "/opt/manager/resources/deployments/{{ tenant_name }}/{{ deployment_id }}/XMProCertificate.pfx"
+    dest: "{{ installation_dir }}\\certificates\\XMProCertificate.pfx"
+  become: true
+
+- name: Import PFX XMPro Certificate into Personal Store
+  ansible.windows.win_certificate_store:
+    key_exportable: true
+    key_storage: "machine"
+    path: "{{ installation_dir }}\\certificates\\XMProCertificate.pfx"
+    state: present
+    store_location: "LocalMachine"
+    store_name: "My"
+    store_type: "system"
+  register: cert_thumbprint
+
+- name: Import PFX XMPro Certificate into Root Store
+  ansible.windows.win_certificate_store:
+    key_exportable: true
+    key_storage: "machine"
+    path: "{{ installation_dir }}\\certificates\\XMProCertificate.pfx"
+    state: present
+    store_location: "LocalMachine"
+    store_name: "Root"
+    store_type: "system"
+
+- name: Add IIS User Access to the XMPro Certificate
+  ansible.windows.win_shell: |
+    $certificateStoreLocation = "Cert:\LocalMachine\My"
+    $certificate = Get-ChildItem $certificateStoreLocation | Where thumbprint -eq {{ cert_thumbprint.thumbprints[0] }}
+    $rsaCert = [System.Security.Cryptography.X509Certificates.RSACertificateExtensions]::GetRSAPrivateKey($certificate)
+    $fileName = $rsaCert.key.UniqueName
+    $path = "C:\ProgramData\Microsoft\Crypto\RSA\MachineKeys\$fileName"
+    $access_rule = `
+      New-Object System.Security.AccessControl.FileSystemAccessRule( `
+      'IIS_IUSRS', `
+      'Read', `
+      'None', `
+      'None', `
+      'Allow' `
+      )
+    $permissions = Get-Acl -Path "$path"
+    $permissions.AddAccessRule($access_rule)
+    Set-Acl -Path $path -AclObject $permissions
+  become: true

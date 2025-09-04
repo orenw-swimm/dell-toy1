@@ -1,0 +1,56 @@
+---
+- name: Install XMPro Subscription Manager IIS Website
+  hosts: subscription_manager_vm
+  become_method: runas
+  become_user: "{{ vm_user_name | default('Administrator') }}"
+  gather_facts: false
+  roles:
+  - role: extract_iis_zip
+    vars:
+      installation_dir: "{{ installation_dir }}"
+      zip_filename: "{{ zip_filename }}"
+      website_directory: "C:\\inetpub\\wwwroot"
+      destination_path: "{{ installation_dir }}\\initial_sm_content"
+
+  - role: prepare_sm_structure
+    vars:
+      initial_sm_content: "{{ installation_dir }}\\initial_sm_content"
+      zip_internal_path: "Content\\C_C\\SM\\obj\\Release\\Package\\PackageTmp"
+      website_directory: "C:\\inetpub\\wwwroot"
+
+  - role: prepare_sm_webconfig
+    vars:
+      webconfig_path: "C:\\inetpub\\wwwroot\\Web.config"
+      signing_cert_name: "{{ signing_cert_name }}"
+      sql_ip: "{{ sql_ip }}"
+      xmpro_password: "{{ xmpro_password }}"
+      sm_product_id: "{{ sm_product_id }}"
+      redis_autoscale_enable: "{{ redis_autoscale_enable }}"
+      smtp_enable: "{{ smtp_enable }}"
+      smtp_server: "{{ smtp_server }}"
+      smtp_enable_ssl: "{{ smtp_enable_ssl }}"
+      smtp_port: "{{ smtp_port }}"
+      smtp_user: "{{ smtp_user }}"
+      smtp_password: "{{ smtp_password }}"
+      smtp_from_address: "{{ smtp_from_address }}"
+      censor_sensitive_data: "{{ censor_sensitive_data }}"
+
+  - role: restart_iis_service
+
+  - role: start_process
+    vars:
+      filename: "{{ ms_dotnet_core_hosting_bundle_filename }}"
+      arguments: "/repair /passive /norestart"
+      installation_dir: "{{ installation_dir }}"
+
+  - role: restart_iis_service
+
+  - role: clean_up_environment
+    vars:
+      installation_dir: "{{ installation_dir }}"
+
+  - role: reboot_machine
+
+  - role: open_website_in_browser
+    vars:
+      website_url: "https://{{ sm_hostname }}/"

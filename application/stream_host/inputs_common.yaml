@@ -1,0 +1,104 @@
+inputs:
+
+  artifact_configuration_secret_name:
+    type: secret_key
+    hidden: false
+    allow_update: false
+    display_label: Artifact Configuration Secret Name
+    description: |
+      Secret name containing details needed for binary image and
+      artifacts download.
+    constraints:
+    - type: blueprint_solutions_artifactory
+    display:
+      group: xmpro
+      index: 1015
+
+  artifact_download_headers_secret_name:
+    type: list
+    hidden: true
+    allow_update: false
+    display_label: Artifact Download Headers Secret Name
+    description: |
+      The secret name that contains headers used for download framework
+      to fetch artifacts. Headers are used for
+      "ansible.windows.win_get_url" module to connect with the external
+      storage.
+    default:
+    - get_input: artifact_configuration_secret_name
+    - artifact_download_headers
+
+  artifact_base_url_parameters:
+    type: string
+    hidden: true
+    allow_update: false
+    display_label: Artifact Download Base URL Parameters
+    description: URL suffix that will be added by default to all artifacts URLs.
+    default:
+      get_secret:
+      - get_input: artifact_configuration_secret_name
+      - artifact_base_url_parameters
+
+  win_get_url_validate_certs:
+    type: boolean
+    hidden: false
+    allow_update: false
+    display_label: Validate SSL Certificate on Downloads
+    description: |
+      If enabled, ensure that SSL certificates are checked.
+      If disabled, allow insecure certificates (such as self-signed).
+    default: false
+    display:
+      group: xmpro
+      index: 1020
+
+  ansible_log_stdout:
+    type: boolean
+    hidden: true
+    allow_update: false
+    display_label: Save Ansible Output to Logs
+    description: |
+      If enabled, the logs from Ansible Playbooks executions will be
+      propagated to the logs of the deployment. Only enable if necessary
+      as this option will slow down the overall execution. Please note
+      that in the case of any errors, logs from Ansible Playbooks
+      executions will still be visible even when this option disabled.
+    default: false
+
+  ansible_censor_sensitive_data:
+    type: boolean
+    hidden: true
+    allow_update: false
+    display_label: Ansible Censor Output in Logs
+    description: |
+      If enabled, the logs from Ansible Playbooks executions
+      will be censored.
+      All logs from tasks with sensitive data will be suppressed.
+      Can be disabled for debugging purposes.
+    default: true
+
+  ansible_external_venv:
+    type: string
+    hidden: true
+    allow_update: false
+    display_label: External Ansible Virtual Environment Path
+    description: Path to the external Ansible Virtual Environment (venv).
+    default: /opt/ansible
+
+  environment_type:
+    type: string
+    hidden: false
+    allow_update: false
+    display_label: Air-Gapped
+    description: |
+      Choose "airgapped" - all the binaries will be downloaded from the local
+      artifact store, or "internet_connected" for binaries that are available
+      on the Internet with a public URL.
+    default: internet_connected
+    constraints:
+    - valid_values:
+      - airgapped
+      - internet_connected
+    display:
+      group: xmpro
+      index: 1025

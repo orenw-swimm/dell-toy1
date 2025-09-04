@@ -1,0 +1,4 @@
+cfy-lint
+pytest
+urllib3<1.27
+wagon<1

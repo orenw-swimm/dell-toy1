@@ -1,0 +1,32 @@
+# Infrastructure - vSphere Windows VM
+
+vm_template: Windows_Server_2019_cleaninstall
+hostname: XMProSH
+vm_user_name: Administrator
+vm_password_secret_name: xmpro_int_win_vm_password
+resource_pool_name: Resources
+vm_folder: Integration_Tests
+datastore_name: VxRail-Virtual-SAN-Datastore-f96d4e19-aa8e-488e-a3c2-c57bf1775851
+allowed_esxi_host: []
+vcpus: 8
+memory_size: 8192
+os_disk_size: 150
+disk_provisioning: thin
+network:
+  name: vlan-1710
+  switch_distributed: true
+  management: true
+  external: true
+dns: []
+dhcp: true
+# gateway: "127.0.0.1"
+# static_ip: "127.0.0.2"
+
+# Application - XMPro Stream Host on Windows
+
+# xmpro_suite_deployment_id: provided directly from tox.ini file
+stream_host_instance_number_for_default: 2
+additional_instances_for_non_default_collection: []
+artifact_configuration_secret_name: xmpro_artifact_configuration
+win_get_url_validate_certs: false
+environment_type: airgapped

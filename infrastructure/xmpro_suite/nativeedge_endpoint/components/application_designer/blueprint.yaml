@@ -1,0 +1,207 @@
+dsl_definitions:
+
+  ansible_common_inputs: &ansible_common_inputs
+    ansible_external_venv: { get_input: ansible_external_venv }
+    sources: { get_property: [SELF, sources] }
+    sensitive_keys: { get_property: [SELF, sensitive_keys] }
+    log_stdout: { get_input: ansible_log_stdout }
+    store_facts: false
+    debug_level: 0
+
+  application_designer_vm: &ansible_application_designer_vm_host
+    ansible_user:
+      get_attribute: [ad_vm_nativeedge, capabilities, vm_username]
+    ansible_password:
+      get_secret: { get_input: ad_vm_password_secret_name }
+    ansible_connection:
+      winrm
+    ansible_winrm_scheme:
+      http
+    ansible_winrm_transport:
+      ntlm
+    ansible_winrm_operation_timeout_sec:
+      180
+    ansible_winrm_read_timeout_sec:
+      360
+
+  set_windows_vm_hostname_playbook_path: &set_windows_vm_hostname_playbook_path
+    application/ansible/set_windows_vm_hostname.yaml
+
+  get_windows_vm_ip_playbook_path: &get_windows_vm_ip_playbook_path
+    application/ansible/get_windows_vm_ip.yaml
+
+  get_vm_info_script_path: &get_vm_info_script_path
+    infrastructure/common/scripts/get_vm_info.py
+
+node_templates:
+
+  # Application Designer VM
+
+  ad_vm_nativeedge:
+    type: dell.nodes.ServiceComponent
+    properties:
+      resource_config:
+        blueprint:
+          external_resource: true
+          id: Windows_Virtual_Machine_for_NativeEdge_Endpoint
+          revision_id: 3.1.1.0
+        deployment:
+          display_name:
+            concat:
+              - "AD-vm-"
+              - { get_sys: [deployment, name] }
+          auto_inc_suffix: true
+          inputs:
+            vm_user_name:
+              get_input: ad_vm_user_name
+            vm_password_secret_name:
+              get_input: ad_vm_password_secret_name
+            service_tag:
+              get_environment_capability: ece_service_tag
+            name:
+              get_input: ad_hostname
+            image:
+              get_attribute: [binary_image, binary_details, extra, artifact_id]
+            os_type:
+              get_input: os_type
+            cpu:
+              get_input: ad_vcpus
+            memory:
+              get_input: ad_memory_size
+            storage:
+              get_input: ad_os_disk_size
+            disk:
+              get_input: ad_disk
+            hardware_options.vTPM:
+              get_input: hardware_options.vTPM
+            hardware_options.secure_boot:
+              get_input: hardware_options.secure_boot
+            hardware_options.firmware_type:
+              get_input: hardware_options.firmware_type
+            enable_management:
+              get_input: enable_management
+            dhcp:
+              get_input: dhcp
+            static_ip:
+              get_input: ad_static_ip
+            dns:
+              get_input: ad_dns
+            gateway:
+              get_input: ad_gateway
+            network_settings:
+              get_input: network_settings
+            usb: { jmespath: ["* || `[]`", {"input": { get_input: ad_usb }}] }
+            serial_port: { jmespath: ["* || `[]`", {"input": { get_input: ad_serial_port }}] }
+            video: { jmespath: ["* || `[]`", {"input": { get_input: ad_video }}] }
+            gpu: { jmespath: ["* || `[]`", {"input": { get_input: ad_gpu_passthrough }}] }
+            cloudinit:
+              get_input: cloudinit
+            iso_files:
+              get_input: iso_files
+    relationships:
+      - type: dell.relationships.depends_on
+        target: binary_image
+      - type: dell.relationships.depends_on
+        target: sm_vm_nativeedge
+      - type: dell.relationships.depends_on
+        target: db_vm_nativeedge
+
+  ad_vm_nativeedge_hostname:
+    type: dell.nodes.ansible.Executor
+    properties:
+      ansible_external_venv: { get_input: ansible_external_venv }
+      number_of_attempts: 60
+      inventory_proxy_settings: &inventory_proxy_settings
+        connection:
+          ip:
+            get_attribute: [ad_vm_nativeedge, capabilities, vm_name]
+          port: 5985
+      sources:
+        all:
+          hosts:
+            win:
+              <<: *ansible_application_designer_vm_host
+              ansible_host:
+                get_attribute: [SELF, inventory_proxy_settings, connection, ip]
+              ansible_port:
+                get_attribute: [SELF, inventory_proxy_settings, connection, port]
+    interfaces:
+      dell.interfaces.lifecycle:
+        start:
+          timeout: 1800
+          max_retries: 60
+          retry_interval: 30
+          implementation: ansible.plugins_ansible.tasks.run
+          inputs:
+            <<: *ansible_common_inputs
+            playbook_path: *set_windows_vm_hostname_playbook_path
+            run_data:
+              hostname:
+                get_input: ad_hostname
+            sensitive_keys:
+              - ansible_user
+              - ansible_password
+              - ansible_ssh_private_key_file
+    relationships:
+      - type: dell.relationships.depends_on
+        target: ad_vm_nativeedge
+
+  ad_vm_nativeedge_ip:
+    type: dell.nodes.ansible.Executor
+    properties:
+      ansible_external_venv: { get_input: ansible_external_venv }
+      number_of_attempts: 60
+      inventory_proxy_settings:
+        <<: *inventory_proxy_settings
+      sources:
+        all:
+          hosts:
+            win:
+              <<: *ansible_application_designer_vm_host
+              ansible_host:
+                get_attribute: [SELF, inventory_proxy_settings, connection, ip]
+              ansible_port:
+                get_attribute: [SELF, inventory_proxy_settings, connection, port]
+    interfaces:
+      dell.interfaces.lifecycle:
+        start:
+          timeout: 1800
+          max_retries: 60
+          retry_interval: 30
+          implementation: ansible.plugins_ansible.tasks.run
+          inputs:
+            <<: *ansible_common_inputs
+            playbook_path: *get_windows_vm_ip_playbook_path
+            run_data:
+              node_instance_id:
+                get_attribute: [SELF, node_instance_id]
+              tap_nic_mac:
+                get_attribute: [ad_vm_nativeedge, capabilities, vm_tap_mac_addr]
+            sensitive_keys:
+              - ansible_user
+              - ansible_password
+              - ansible_ssh_private_key_file
+    relationships:
+      - type: dell.relationships.depends_on
+        target: ad_vm_nativeedge_hostname
+
+  application_designer_vm:
+    type: dell.nodes.Root
+    interfaces:
+      dell.interfaces.lifecycle:
+        start:
+          implementation: *get_vm_info_script_path
+          executor: central_deployment_agent
+          inputs:
+            vm_host:
+              get_attribute: [ad_vm_nativeedge, capabilities, vm_name]
+            vm_winrm_port: 5985
+            vm_name:
+              get_attribute: [ad_vm_nativeedge, capabilities, vm_name]
+            vm_username:
+              get_attribute: [ad_vm_nativeedge, capabilities, vm_username]
+            vm_nativeedge_node_id:
+              get_attribute: [ad_vm_nativeedge_ip, node_instance_id]
+    relationships:
+      - type: dell.relationships.depends_on
+        target: ad_vm_nativeedge_ip

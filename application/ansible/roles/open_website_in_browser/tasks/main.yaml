@@ -1,0 +1,14 @@
+---
+- name: Start MS Edge with URL
+  ansible.windows.win_shell: |
+    Start-Process "msedge.exe" -ArgumentList "{{ website_url }}"
+    Start-Sleep -Seconds 30
+    if (Get-Process msedge -ErrorAction SilentlyContinue) {
+        Write-Host "Success"
+    }
+  register: browser_result
+  retries: 5
+  delay: 10
+  until: browser_result.stdout == "Success"
+  ignore_errors: yes
+  become: true

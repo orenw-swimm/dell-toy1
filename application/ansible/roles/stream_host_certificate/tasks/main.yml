@@ -1,0 +1,32 @@
+---
+- name: Upload XMPro Certificate
+  ansible.windows.win_copy:
+    src: "{{ cert_path }}"
+    dest: "{{ stream_host_installation_dir }}\\XMProCertificate.pfx"
+  become: true
+
+- name: Import PFX certificate into Personal store
+  ansible.windows.win_certificate_store:
+    key_exportable: true
+    key_storage: "machine"
+    path: "{{ stream_host_installation_dir }}\\XMProCertificate.pfx"
+    state: present
+    store_location: "LocalMachine"
+    store_name: "My"
+    store_type: "system"
+  register: signcert_thumbprint
+
+- name: Import PFX certificate into Root store
+  ansible.windows.win_certificate_store:
+    key_exportable: true
+    key_storage: "machine"
+    path: "{{ stream_host_installation_dir }}\\XMProCertificate.pfx"
+    state: present
+    store_location: "LocalMachine"
+    store_name: "Root"
+    store_type: "system"
+
+- name: Delete certificate
+  ansible.windows.win_file:
+    path: "{{ stream_host_installation_dir }}\\XMProCertificate.pfx"
+    state: absent

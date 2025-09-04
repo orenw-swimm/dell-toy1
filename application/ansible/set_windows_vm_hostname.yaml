@@ -1,0 +1,14 @@
+---
+- name: Set Windows VM Hostname
+  hosts: win
+  gather_facts: false
+  tasks:
+    - name: Set the Hostname
+      ansible.windows.win_hostname:
+        name: "{{ hostname }}"
+      register: set_hostname_result
+
+    - name: Reboot if necessary
+      include_role:
+        name: reboot_machine
+      when: set_hostname_result.reboot_required

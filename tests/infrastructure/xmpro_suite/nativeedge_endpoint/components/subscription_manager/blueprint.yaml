@@ -1,0 +1,220 @@
+dsl_definitions:
+
+  ansible_common_inputs: &ansible_common_inputs
+    ansible_external_venv: { get_input: ansible_external_venv }
+    sources: { get_property: [SELF, sources] }
+    sensitive_keys: { get_property: [SELF, sensitive_keys] }
+    log_stdout: { get_input: ansible_log_stdout }
+    store_facts: false
+    debug_level: 0
+
+  subscription_manager_vm: &ansible_subscription_manager_vm_host
+    ansible_host:
+      get_attribute: [sm_vm_winrm_proxy, eo_proxy_url]
+    ansible_port:
+      get_attribute: [sm_vm_winrm_proxy, eo_proxy_port]
+    ansible_user:
+      get_attribute: [sm_vm_nativeedge, capabilities, vm_username]
+    ansible_password:
+      get_secret: { get_input: sm_vm_password_secret_name }
+    ansible_connection:
+      winrm
+    ansible_winrm_scheme:
+      http
+    ansible_winrm_transport:
+      ntlm
+    ansible_winrm_operation_timeout_sec:
+      180
+    ansible_winrm_read_timeout_sec:
+      360
+
+  set_windows_vm_hostname_playbook_path: &set_windows_vm_hostname_playbook_path
+    application/ansible/set_windows_vm_hostname.yaml
+
+  get_windows_vm_ip_playbook_path: &get_windows_vm_ip_playbook_path
+    application/ansible/get_windows_vm_ip.yaml
+
+  get_vm_info_script_path: &get_vm_info_script_path
+    infrastructure/common/scripts/get_vm_info.py
+
+node_templates:
+
+ # Subscription Manager VM
+
+  sm_vm_nativeedge:
+    type: dell.nodes.ApplicationModule
+    interfaces:
+      dell.interfaces.lifecycle:
+        start:
+          implementation: tests/utilities/set_runtime_properties.py
+          executor: central_deployment_agent
+          inputs:
+            capabilities:
+              vm_name: { get_input: sm_hostname }
+              service_tag: { get_environment_capability: ece_service_tag }
+              vm_username: { get_input: sm_vm_user_name }
+              vm_tap_mac_addr: "00:11:aa:bb:cc:dd"
+        poststart:
+          implementation: tests/utilities/verify_inputs.py
+          executor: central_deployment_agent
+          inputs:
+            display_name:
+              concat:
+                - "SM-vm-"
+                - { get_sys: [deployment, name] }
+            vm_user_name:
+              get_input: sm_vm_user_name
+            vm_password_secret_name:
+              get_input: sm_vm_password_secret_name
+            service_tag:
+              get_environment_capability: ece_service_tag
+            name:
+              get_input: sm_hostname
+            image:
+              get_attribute: [binary_image, binary_details, extra, artifact_id]
+            os_type:
+              get_input: os_type
+            cpu:
+              get_input: sm_vcpus
+            memory:
+              get_input: sm_memory_size
+            storage:
+              get_input: sm_os_disk_size
+            disk:
+              get_input: sm_disk
+            hardware_options.vTPM:
+              get_input: hardware_options.vTPM
+            hardware_options.secure_boot:
+              get_input: hardware_options.secure_boot
+            hardware_options.firmware_type:
+              get_input: hardware_options.firmware_type
+            enable_management:
+              get_input: enable_management
+            dhcp:
+              get_input: dhcp
+            static_ip:
+              get_input: sm_static_ip
+            dns:
+              get_input: sm_dns
+            gateway:
+              get_input: sm_gateway
+            network_settings:
+              get_input: network_settings
+            usb:
+              get_input: sm_usb
+            serial_port:
+              get_input: sm_serial_port
+            gpu:
+              get_input: sm_gpu_passthrough
+            video:
+              get_input: sm_video
+            cloudinit:
+              get_input: cloudinit
+            iso_files:
+              get_input: iso_files
+    relationships:
+      - type: dell.relationships.depends_on
+        target: binary_image
+
+  sm_vm_winrm_proxy:
+    type: dell.nodes.ApplicationModule
+    interfaces:
+      dell.interfaces.lifecycle:
+        start:
+          implementation: tests/utilities/set_runtime_properties.py
+          executor: central_deployment_agent
+          inputs:
+            eo_proxy_url: "nativeedge.host.test"
+            eo_proxy_port: 5985
+        poststart:
+          implementation: tests/utilities/verify_inputs.py
+          executor: central_deployment_agent
+          inputs:
+            serviceTag:
+              get_attribute: [sm_vm_nativeedge, capabilities, service_tag]
+            vmRef:
+              get_attribute: [sm_vm_nativeedge, capabilities, vm_name]
+            port: 5985
+    relationships:
+      - type: dell.relationships.depends_on
+        target: sm_vm_nativeedge
+
+  sm_vm_nativeedge_hostname:
+    type: dell.nodes.ApplicationModule
+    interfaces:
+      dell.interfaces.lifecycle:
+        poststart:
+          implementation: tests/utilities/verify_inputs.py
+          executor: central_deployment_agent
+          inputs:
+            win: *ansible_subscription_manager_vm_host
+            playbook_path: *set_windows_vm_hostname_playbook_path
+            ansible_external_venv: { get_input: ansible_external_venv }
+            hostname:
+              get_attribute: [sm_vm_nativeedge, capabilities, vm_name]
+            sensitive_keys:
+              - ansible_user
+              - ansible_password
+              - ansible_ssh_private_key_file
+    relationships:
+      - type: dell.relationships.depends_on
+        target: sm_vm_winrm_proxy
+
+  sm_vm_nativeedge_ip:
+    type: dell.nodes.ApplicationModule
+    interfaces:
+      dell.interfaces.lifecycle:
+        poststart:
+          implementation: tests/utilities/verify_inputs.py
+          executor: central_deployment_agent
+          inputs:
+            win: *ansible_subscription_manager_vm_host
+            playbook_path: *get_windows_vm_ip_playbook_path
+            ansible_external_venv: { get_input: ansible_external_venv }
+            node_instance_id:
+              get_attribute: [SELF, node_instance_id]
+            tap_nic_mac:
+              get_attribute: [sm_vm_nativeedge, capabilities, vm_tap_mac_addr]
+            sensitive_keys:
+              - ansible_user
+              - ansible_password
+              - ansible_ssh_private_key_file
+    relationships:
+      - type: dell.relationships.depends_on
+        target: sm_vm_nativeedge_hostname
+
+  subscription_manager_vm:
+    type: dell.nodes.ApplicationModule
+    interfaces:
+      dell.interfaces.lifecycle:
+        start:
+          implementation: tests/utilities/set_runtime_properties.py
+          executor: central_deployment_agent
+          inputs:
+            vm_host: "nativeedge.host.test"
+            vm_public_ip: 127.0.0.1
+            vm_winrm_port: 5985
+            vm_name:
+              get_attribute: [sm_vm_nativeedge, capabilities, vm_name]
+            vm_username:
+              get_attribute: [sm_vm_nativeedge, capabilities, vm_username]
+        poststart:
+          implementation: tests/utilities/verify_inputs.py
+          executor: central_deployment_agent
+          inputs:
+            implementation: *get_vm_info_script_path
+            vm_host:
+              get_attribute: [sm_vm_winrm_proxy, eo_proxy_url]
+            vm_winrm_port:
+              get_attribute: [sm_vm_winrm_proxy, eo_proxy_port]
+            vm_name:
+              get_attribute: [sm_vm_nativeedge, capabilities, vm_name]
+            vm_username:
+              get_attribute: [sm_vm_nativeedge, capabilities, vm_username]
+            vm_nativeedge_node_id:
+              get_attribute: [sm_vm_nativeedge_ip, node_instance_id]
+    relationships:
+      - type: dell.relationships.depends_on
+        target: sm_vm_winrm_proxy
+      - type: dell.relationships.depends_on
+        target: sm_vm_nativeedge_ip

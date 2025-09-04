@@ -1,0 +1,39 @@
+dsl_definitions:
+
+  application_designer_zip_filename: &application_designer_zip_filename
+    AD.zip
+
+  application_designer_zip_url: &application_designer_zip_url
+    concat:
+      - { get_attribute: [validate_secrets, installer_url] }
+      - *application_designer_zip_filename
+      - { get_input: artifact_base_url_parameters }
+
+inputs:
+
+  ad_installation_dir:
+    type: string
+    hidden: true
+    display_label: XMPro Application Designer Installation Directory
+    description: >
+      Directory on the newly created Windows Virtual Machine
+      for XMPro Application Designer that stores the installation files.
+    default:
+      concat:
+        - 'C:\Users\'
+        - { get_input: ad_vm_user_name }
+        - '\XMPro_Application_Designer'
+
+  application_designer_zip_filename:
+    type: string
+    hidden: true
+    display_label: XMPro Application Designer Installer File Name
+    description: XMPro Application Designer Installer File Name
+    default: *application_designer_zip_filename
+
+  application_designer_zip_url:
+    type: string
+    hidden: true
+    display_label: XMPro Application Designer Installer URL
+    description: XMPro Application Designer Installer URL
+    default: *application_designer_zip_url

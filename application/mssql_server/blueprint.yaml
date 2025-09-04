@@ -1,0 +1,242 @@
+dsl_definitions:
+
+  ansible_common_inputs: &ansible_common_inputs
+    ansible_external_venv: { get_input: ansible_external_venv }
+    sources: { get_property: [SELF, sources] }
+    sensitive_keys: { get_property: [SELF, sensitive_keys] }
+    log_stdout: { get_input: ansible_log_stdout }
+    store_facts: false
+    debug_level: 0
+
+  ansible_env_vars: &ansible_env_vars
+    ANSIBLE_HOST_KEY_CHECKING: "False"
+    ANSIBLE_INVALID_TASK_ATTRIBUTE_FAILED: "False"
+    ANSIBLE_STDOUT_CALLBACK: json
+    ANSIBLE_FACT_PATH:
+      concat:
+        - "C:\\Users\\"
+        - { get_attribute: [mssql_server_vm, capabilities, vm_username] }
+        - "\\AppData\\Local\\Temp\\"
+        - { get_sys: [deployment, id] }
+
+  ansible_common_host_props: &ansible_common_host_props
+    ansible_connection: winrm
+    ansible_winrm_scheme: http
+    ansible_winrm_transport: ntlm
+    ansible_winrm_operation_timeout_sec: 180
+    ansible_winrm_read_timeout_sec: 360
+
+  mssql_server_vm: &ansible_mssql_server_vm_host
+    ansible_user:
+      get_attribute: [mssql_server_vm, capabilities, vm_username]
+    ansible_password:
+      get_secret: { get_input: db_vm_password_secret_name }
+    <<: *ansible_common_host_props
+
+  mssql_server_playbook_path: &mssql_server_playbook_path
+    application/ansible/install_mssql_server.yaml
+
+  upgrade_database_playbook_path: &upgrade_database_playbook_path
+    application/ansible/upgrade_database.yaml
+
+node_templates:
+
+  mssql_sa_password_secret:
+    type: dell.nodes.PasswordSecret
+    properties:
+      length: 12
+      uppercase: 4
+      lowercase: 4
+      digits: 4
+      symbols: -1
+      secret_name:
+        concat:
+          - "mssql_sa_user_password_"
+          - { get_sys: [deployment, id] }
+      use_secret_if_exists: false
+    relationships:
+      - type: dell.relationships.depends_on
+        target: validate_secrets
+
+  mssql_xmpro_password_secret:
+    type: dell.nodes.PasswordSecret
+    properties:
+      length: 12
+      uppercase: 4
+      lowercase: 4
+      digits: 4
+      symbols: -1
+      secret_name:
+        concat:
+          - "mssql_xmpro_user_password_"
+          - { get_sys: [deployment, id] }
+      use_secret_if_exists: false
+    relationships:
+      - type: dell.relationships.depends_on
+        target: validate_secrets
+
+  install_mssql_server:
+    type: dell.nodes.ansible.Executor
+    properties:
+      ansible_external_venv: { get_input: ansible_external_venv }
+      number_of_attempts: 20
+      inventory_proxy_settings: &inventory_proxy_settings
+        connection:
+          ip:
+            get_attribute: [mssql_server_vm, capabilities, vm_host]
+          port:
+            get_attribute: [mssql_server_vm, capabilities, vm_winrm_port]
+      sources:
+        all:
+          hosts:
+            win:
+              <<: *ansible_mssql_server_vm_host
+              ansible_host:
+                get_attribute: [SELF, inventory_proxy_settings, connection, ip]
+              ansible_port:
+                get_attribute: [SELF, inventory_proxy_settings, connection, port]
+    interfaces:
+      dell.interfaces.lifecycle:
+        start:
+          timeout: 18000
+          max_retries: 20
+          retry_interval: 60
+          implementation: ansible.plugins_ansible.tasks.run
+          inputs:
+            <<: *ansible_common_inputs
+            playbook_path: *mssql_server_playbook_path
+            run_data:
+              vm_user_name:
+                get_attribute: [mssql_server_vm, capabilities, vm_username]
+              installation_dir:
+                get_input: mssql_server_installation_dir
+              iso_download_url:
+                get_input: mssql_server_installer_url
+              iso_filename:
+                get_input: mssql_server_installer_filename
+              sm_db_migrations_url:
+                get_input: sm_db_migrations_url
+              sm_db_migrations_filename:
+                get_input: sm_db_migrations_filename
+              ds_db_migrations_url:
+                get_input: ds_db_migrations_url
+              ds_db_migrations_filename:
+                get_input: ds_db_migrations_filename
+              ad_db_migrations_url:
+                get_input: ad_db_migrations_url
+              ad_db_migrations_filename:
+                get_input: ad_db_migrations_filename
+              mssql_server_version:
+                get_input: mssql_server_version
+              artifact_validate_certs:
+                get_input: win_get_url_validate_certs
+              artifact_headers:
+                get_secret:
+                  get_input: artifact_download_headers_secret_name
+              db_port:
+                1433
+              sa_password:
+                get_attribute: [mssql_sa_password_secret, password]
+              xmpro_password:
+                get_attribute: [mssql_xmpro_password_secret, password]
+              censor_sensitive_data:
+                get_input: ansible_censor_sensitive_data
+            sensitive_keys:
+              - ansible_password
+              - ansible_user
+              - ansible_ssh_private_key_file
+              - artifact_headers
+              - sa_password
+              - xmpro_password
+    relationships:
+      - type: dell.relationships.depends_on
+        target: mssql_sa_password_secret
+      - type: dell.relationships.depends_on
+        target: mssql_xmpro_password_secret
+      - type: dell.relationships.depends_on
+        target: mssql_server_vm
+
+  upgrade_database:
+    type: dell.nodes.ansible.Executor
+    properties:
+      ansible_external_venv: { get_input: ansible_external_venv }
+      number_of_attempts: 20
+      inventory_proxy_settings:
+        <<: *inventory_proxy_settings
+      sources:
+        all:
+          hosts:
+            win:
+              <<: *ansible_mssql_server_vm_host
+              ansible_host:
+                get_attribute: [SELF, inventory_proxy_settings, connection, ip]
+              ansible_port:
+                get_attribute: [SELF, inventory_proxy_settings, connection, port]
+    interfaces:
+      dell.interfaces.lifecycle:
+        start:
+          timeout: 18000
+          max_retries: 20
+          retry_interval: 60
+          implementation: ansible.plugins_ansible.tasks.run
+          inputs:
+            <<: *ansible_common_inputs
+            playbook_path: *upgrade_database_playbook_path
+            ansible_env_vars: *ansible_env_vars
+            run_data:
+              vm_user_name:
+                get_attribute: [mssql_server_vm, capabilities, vm_username]
+              installation_dir:
+                get_input: mssql_server_installation_dir
+              xmpro_password:
+                get_attribute: [mssql_xmpro_password_secret, password]
+              ds_url:
+                concat:
+                  - "https://"
+                  - get_attribute: [get_data_stream_designer_hostname, hostname]
+                  - "/"
+              ad_url:
+                concat:
+                  - "https://"
+                  - get_attribute: [get_application_designer_hostname, hostname]
+                  - "/"
+              company_name:
+                get_input: company_name
+              first_name:
+                get_input: first_name
+              last_name:
+                get_input: last_name
+              email:
+                get_input: email
+              company_admin_password:
+                get_secret: { get_input: company_admin_password_secret_name }
+              site_admin_password:
+                get_secret: { get_input: site_admin_password_secret_name }
+              node_instance_id:
+                get_attribute: [generate_ca, node_instance_id]
+              censor_sensitive_data:
+                get_input: ansible_censor_sensitive_data
+            sensitive_keys:
+              - ansible_password
+              - ansible_user
+              - ansible_ssh_private_key_file
+              - xmpro_password
+              - company_admin_password
+              - site_admin_password
+        poststart:
+          implementation: application/scripts/get_file_contents.py
+          executor: central_deployment_agent
+          inputs:
+            node_instance_id:
+              get_attribute: [generate_ca, node_instance_id]
+    relationships:
+      - type: dell.relationships.depends_on
+        target: mssql_xmpro_password_secret
+      - type: dell.relationships.depends_on
+        target: install_mssql_server
+      - type: dell.relationships.depends_on
+        target: get_subscription_manager_hostname
+      - type: dell.relationships.depends_on
+        target: get_application_designer_hostname
+      - type: dell.relationships.depends_on
+        target: get_data_stream_designer_hostname

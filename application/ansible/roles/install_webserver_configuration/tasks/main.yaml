@@ -1,0 +1,36 @@
+---
+- name: Check If All Windows Optional Features Are Installed
+  ansible.windows.win_stat:
+    path: "{{ installation_dir }}\\InstalledWindowsOptionalFeatures.txt"
+  register: installed_windows_optional_features
+  changed_when: not installed_windows_optional_features.stat.exists
+  retries: 15
+  delay: 60
+  until: installed_windows_optional_features.stat.exists
+
+- name: Wait before IIS restart
+  ansible.builtin.pause:
+    seconds: 30
+
+- name: Restart IIS
+  ansible.windows.win_shell: |
+    Stop-Service -Name "W3SVC" -Force
+    Sleep 15
+    Start-Service -Name "W3SVC"
+    Sleep 15
+  become: true
+
+- name: Enable Active Scripting and Allow Scriptlets
+  ansible.windows.win_shell: |
+    $regPath = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Internet Settings\Zones\3"
+    Set-ItemProperty -Path $regPath -Name "1400" -Value 0
+    Set-ItemProperty -Path $regPath -Name "1209" -Value 0
+  become: true
+
+- name: Disable IE Enhanced Security Configuration for Administrators
+  ansible.windows.win_shell: |
+    $regPath1 = "HKLM:\SOFTWARE\Microsoft\Active Setup\Installed Components\{A509B1A7-37EF-4b3f-8CFC-4F3A74704073}"
+    $regPath2 = "HKLM:\SOFTWARE\Microsoft\Active Setup\Installed Components\{A509B1A8-37EF-4b3f-8CFC-4F3A74704073}"
+    Set-ItemProperty -Path $regPath1 -Name "IsInstalled" -Value 0
+    Set-ItemProperty -Path $regPath2 -Name "IsInstalled" -Value 0
+  become: true

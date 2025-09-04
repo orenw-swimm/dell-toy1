@@ -1,0 +1,276 @@
+dsl_definitions:
+
+  ms_dotnet_core_hosting_bundle_filename: &ms_dotnet_core_hosting_bundle_filename
+    dotnet-hosting-6.0.25-win.exe
+
+  ms_dotnet_core_hosting_bundle_url: &ms_dotnet_core_hosting_bundle_url
+    internet_connected:
+      https://download.visualstudio.microsoft.com/download/pr/1fd87564-6bdb-4123-90dd-26488ec868c9/6c68988c310805bdcbb07b704fbe3e9d/dotnet-hosting-6.0.25-win.exe
+    airgapped:
+      concat:
+        - { get_attribute: [validate_secrets, installer_url] }
+        - *ms_dotnet_core_hosting_bundle_filename
+        - { get_input: artifact_base_url_parameters }
+
+  url_rewrite_module_filename: &url_rewrite_module_filename
+    rewrite_amd64_en-US.msi
+
+  url_rewrite_module_url: &url_rewrite_module_url
+    internet_connected:
+      https://download.microsoft.com/download/1/2/8/128E2E22-C1B9-44A4-BE2A-5859ED1D4592/rewrite_amd64_en-US.msi
+    airgapped:
+      concat:
+        - { get_attribute: [validate_secrets, installer_url] }
+        - *url_rewrite_module_filename
+        - { get_input: artifact_base_url_parameters }
+
+inputs:
+
+  company_name:
+    type: string
+    hidden: false
+    allow_update: false
+    display_label: Company Name
+    description: >
+      Name of the Company. Will be also used for resource naming.
+      Must be between 1 and 15 characters long.
+    constraints:
+      - pattern: '^.{1,15}$'
+        error_message: Must be between 1 and 15 characters long.
+    display:
+      group: xmpro
+      index: 1015
+
+  first_name:
+    type: string
+    hidden: false
+    allow_update: false
+    display_label: Administrator First Name
+    description: >
+      First Name of the Administrator User.
+      Cannot contain leading or trailing spaces.
+    constraints:
+      - pattern: '^(?!\s)(?!.*\s$).*$'
+        error_message: Cannot contain leading or trailing spaces.
+    display:
+      group: xmpro
+      index: 1020
+
+  last_name:
+    type: string
+    hidden: false
+    allow_update: false
+    display_label: Administrator Last Name
+    description: >
+      Last Name of the Administrator User.
+      Cannot contain leading or trailing spaces.
+    constraints:
+      - pattern: '^(?!\s)(?!.*\s$).*$'
+        error_message: Cannot contain leading or trailing spaces.
+    display:
+      group: xmpro
+      index: 1025
+
+  email:
+    type: string
+    hidden: false
+    allow_update: false
+    display_label: User E-Mail
+    description: E-Mail address of the user.
+    constraints:
+      - pattern: '^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+        error_message: Invalid format for e-mail address.
+    display:
+      group: xmpro
+      index: 1030
+
+  company_admin_password_secret_name:
+    type: secret_key
+    constraints:
+      - type: password
+    hidden: false
+    allow_update: false
+    display_label: Company Admin Password Secret Name
+    description: |
+      Secret name containing the Company Admin Password.
+      Please note that the password must be between 8 and 50 characters
+      long and must not contain any of the following special
+      characters: `'\"$@
+    display:
+      group: xmpro
+      index: 1035
+
+  site_admin_password_secret_name:
+    type: secret_key
+    constraints:
+      - type: password
+    hidden: false
+    allow_update: false
+    display_label: Site Admin Password Secret Name
+    description: |
+      Secret name containing the Site Admin Password.
+      Please note that the password must be between 8 and 50 characters
+      long and must not contain any of the following special
+      characters: `'\"$@
+    display:
+      group: xmpro
+      index: 1040
+
+  smtp_enable:
+    type: boolean
+    hidden: false
+    allow_update: false
+    display_label: SMTP Enable
+    description: |
+      If enabled, SMTP will be used to send e-mail notifications.
+      Required for several features including password resets
+      and user registration.
+    default: true
+    display:
+      group: xmpro_smtp
+      index: 1045
+
+  smtp_server:
+    type: string
+    hidden: false
+    only_with: smtp_enable
+    allow_update: false
+    display_label: SMTP Server
+    description: SMTP Server host
+    required: false
+    constraints:
+      - max_length: 256
+        error_message: SMTP server host cannot be longer than 256 characters.
+    display:
+      group: xmpro_smtp
+      index: 1050
+
+  smtp_port:
+    type: integer
+    hidden: false
+    only_with: smtp_enable
+    allow_update: false
+    display_label: SMTP Port
+    description: SMTP Server port
+    required: false
+    default: 587
+    constraints:
+      - in_range: [1, 65535]
+        error_message: SMTP Port number must be between 1 and 65535.
+    display:
+      group: xmpro_smtp
+      index: 1055
+
+  smtp_user:
+    type: string
+    hidden: false
+    only_with: smtp_enable
+    allow_update: false
+    display_label: SMTP User
+    description: SMTP Server user
+    required: false
+    constraints:
+      - max_length: 128
+        error_message: SMTP user cannot be longer than 128 characters.
+    display:
+      group: xmpro_smtp
+      index: 1060
+
+  smtp_password_secret_name:
+    type: secret_key
+    constraints:
+      - type: password
+    hidden: false
+    only_with: smtp_enable
+    allow_update: false
+    display_label: SMTP User Password Secret Name
+    description: Secret name containing the SMTP user password.
+    required: false
+    display:
+      group: xmpro_smtp
+      index: 1065
+
+  smtp_enable_ssl:
+    type: boolean
+    hidden: false
+    only_with: smtp_enable
+    allow_update: false
+    display_label: SMTP SSL
+    description: If enabled, SMTP connections will use SSL.
+    required: false
+    default: true
+    display:
+      group: xmpro_smtp
+      index: 1070
+
+  smtp_from_address:
+    type: string
+    hidden: false
+    only_with: smtp_enable
+    allow_update: false
+    display_label: SMTP Envelope Sender E-Mail Address
+    description: The e-mail address for the SMTP user
+    required: false
+    constraints:
+      - pattern: '^(?:[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})?$'
+        error_message: Invalid format for e-mail address.
+    display:
+      group: xmpro_smtp
+      index: 1075
+
+  artifacts_urls:
+    type: string
+    hidden: true
+    display_label: Artifacts URLs
+    description: >
+      URLs of all artifacts for internet_connected and airgapped
+      installation.
+    default:
+      ms_dotnet_core_hosting_bundle: *ms_dotnet_core_hosting_bundle_url
+      url_rewrite_module: *url_rewrite_module_url
+
+  signing_cert_name:
+    type: string
+    hidden: true
+    allow_update: false
+    display_label: XMPro Signing Certificate Name
+    description: Name of the XMPro Signing Certificate
+    default: XMProSignCert
+
+  ms_dotnet_core_hosting_bundle_filename:
+    type: string
+    hidden: true
+    display_label: ASP.NET Core Runtime 6.0 Hosting Bundle Installer File Name
+    description: >
+      Microsoft ASP .NET Core Runtime 6.0 Hosting Bundle Installer File Name
+    default: *ms_dotnet_core_hosting_bundle_filename
+
+  ms_dotnet_core_hosting_bundle_url:
+    type: string
+    hidden: true
+    display_label: ASP.NET Core Runtime 6.0 Hosting Bundle Installer URL
+    description: >
+      Microsoft ASP .NET Core Runtime 6.0 Hosting Bundle Installer URL
+    default:
+      get_input:
+        - artifacts_urls
+        - ms_dotnet_core_hosting_bundle
+        - { get_input: environment_type }
+
+  url_rewrite_module_filename:
+    type: string
+    hidden: true
+    display_label: URL Rewrite Module Installer File Name
+    description: URL Rewrite Module Installer File Name
+    default: *url_rewrite_module_filename
+
+  url_rewrite_module_url:
+    type: string
+    hidden: true
+    display_label: URL Rewrite Module Installer URL
+    description: URL Rewrite Module Installer URL
+    default:
+      get_input:
+        - artifacts_urls
+        - url_rewrite_module
+        - { get_input: environment_type }

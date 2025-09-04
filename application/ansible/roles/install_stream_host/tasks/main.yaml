@@ -1,0 +1,65 @@
+---
+- name: Prepare files
+  ansible.windows.win_powershell:
+    script: |
+      $ShFilePathZip = "{{ stream_host_service_filename | replace('.exe', '.zip') }}"
+      Expand-Archive $ShFilePathZip -DestinationPath "{{ stream_host_installation_dir }}//{{ stream_host_service_filename | replace('.exe', '') }}"
+  args:
+    chdir: "{{ stream_host_installation_dir }}"
+  become: true
+  become_user: "{{ vm_user_name }}"
+
+- name: Copy Install Script
+  ansible.windows.win_copy:
+    src: scripts/Install-SH.ps1
+    dest: "{{ stream_host_installation_dir }}\\Install-SH.ps1"
+
+- name: Copy Deploy Script
+  ansible.windows.win_copy:
+    src: scripts//deploy.ps1
+    dest: "{{ stream_host_installation_dir }}\\deploy.ps1"
+
+- name: Install SH template
+  ansible.windows.win_shell: |
+    $MsiPath = "{{ stream_host_installation_dir }}\\{{ stream_host_service_filename | replace('.exe', '')}}\\{{ sh_msi_exec_file }}"
+    $MsiLogs = "{{ stream_host_installation_dir }}\\msilogs.txt"
+    $InstallDir = "{{ stream_host_installation_dir }}\\{{ stream_host_service_filename | replace('.exe', '')}}\\SH"
+    .\\Install-SH.ps1 -MsiPath $MsiPath -MsiLogs $MsiLogs -InstallDir $InstallDir -ServiceName "SHTEMPLATE"
+  become: true
+  become_user: "{{ vm_user_name }}"
+  args:
+    chdir: "{{ stream_host_installation_dir }}"
+
+- name: Check if the SH Directory already exists
+  win_shell: Test-Path -Path "{{ stream_host_installation_dir }}//{{ stream_host_service_filename | replace('.exe', '')}}//SH"
+  register: directory_exists2
+
+- name: Stop Template Service
+  ansible.windows.win_shell: |
+    Get-Service "SHTEMPLATE" | Stop-Service -Force
+  become: true
+  become_user: "{{ vm_user_name }}"
+  failed_when: "'False' in directory_exists2.stdout"
+
+- name: Prepare config
+  ansible.windows.win_copy:
+    dest: "{{ stream_host_installation_dir }}//streamhosts.json"
+    content: "{{ stream_host_config | to_json }}"
+  vars:
+    stream_host_config: "{{ stream_host_services_information }}"
+
+- name: Deploy Stream Hosts
+  ansible.windows.win_shell: |
+    $jsonFilePath = ".\streamhosts.json"
+    $sourcePath = "{{ stream_host_installation_dir }}//{{ stream_host_service_filename | replace('.exe', '')}}//SH"
+    ./deploy.ps1 -jsonFilePath $jsonFilePath -sourcePath $sourcePath
+  become: true
+  become_user: "{{ vm_user_name }}"
+  args:
+    chdir: "{{ stream_host_installation_dir }}"
+
+- name: Verify services
+  win_service:
+    name: "{{ item }}"
+  register: service_info
+  loop: "{{ sh_services | list }}"

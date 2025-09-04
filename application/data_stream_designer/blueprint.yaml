@@ -1,0 +1,283 @@
+dsl_definitions:
+
+  ansible_common_properties: &ansible_common_properties
+    ansible_external_venv: { get_input: ansible_external_venv }
+    number_of_attempts: 20
+
+  ansible_common_inputs: &ansible_common_inputs
+    ansible_external_venv: { get_input: ansible_external_venv }
+    sources: { get_property: [SELF, sources] }
+    sensitive_keys: { get_property: [SELF, sensitive_keys] }
+    log_stdout: { get_input: ansible_log_stdout }
+    store_facts: false
+    debug_level: 0
+
+  ansible_common_host_props: &ansible_common_host_props
+    ansible_connection: winrm
+    ansible_winrm_scheme: http
+    ansible_winrm_transport: ntlm
+    ansible_winrm_operation_timeout_sec: 180
+    ansible_winrm_read_timeout_sec: 360
+
+  data_stream_designer_vm: &ansible_data_stream_designer_vm_host
+    ansible_user:
+      get_attribute: [data_stream_designer_vm, capabilities, vm_username]
+    ansible_password:
+      get_secret: { get_input: ds_vm_password_secret_name }
+    <<: *ansible_common_host_props
+
+  ansible_common_run_config: &ansible_common_run_config
+    timeout: 18000
+    max_retries: 20
+    retry_interval: 60
+    implementation: ansible.plugins_ansible.tasks.run
+
+  get_hostname_playbook_path: &get_hostname_playbook_path
+    application/ansible/get_windows_vm_hostname.yaml
+
+  prepare_iis_phase1_playbook_path: &prepare_iis_phase1_playbook_path
+    application/ansible/prepare_iis_phase1.yaml
+
+  prepare_iis_phase2_playbook_path: &prepare_iis_phase2_playbook_path
+    application/ansible/prepare_iis_phase2.yaml
+
+  prepare_iis_phase3_playbook_path: &prepare_iis_phase3_playbook_path
+    application/ansible/prepare_iis_phase3.yaml
+
+  ds_website_playbook_path: &ds_website_playbook_path
+    application/ansible/install_data_stream_designer_website.yaml
+
+node_templates:
+
+  get_data_stream_designer_hostname:
+    type: dell.nodes.ansible.Executor
+    properties:
+      <<: *ansible_common_properties
+      inventory_proxy_settings: &inventory_proxy_settings
+        connection:
+          ip:
+            get_attribute: [data_stream_designer_vm, capabilities, vm_host]
+          port:
+            get_attribute: [data_stream_designer_vm, capabilities, vm_winrm_port]
+      sources:
+        all:
+          hosts:
+            win:
+              <<: *ansible_data_stream_designer_vm_host
+              ansible_host:
+                get_attribute: [SELF, inventory_proxy_settings, connection, ip]
+              ansible_port:
+                get_attribute: [SELF, inventory_proxy_settings, connection, port]
+    interfaces:
+      dell.interfaces.lifecycle:
+        start:
+          <<: *ansible_common_run_config
+          inputs:
+            <<: *ansible_common_inputs
+            playbook_path: *get_hostname_playbook_path
+            run_data:
+              node_instance_id:
+                get_attribute: [SELF, node_instance_id]
+            sensitive_keys:
+              - ansible_user
+              - ansible_password
+              - ansible_ssh_private_key_file
+        poststart:
+          implementation: application/scripts/get_hostname.py
+          executor: central_deployment_agent
+          inputs:
+            node_instance_id:
+              get_attribute: [SELF, node_instance_id]
+    relationships:
+      - type: dell.relationships.depends_on
+        target: data_stream_designer_vm
+
+  prepare_data_stream_designer_iis:
+    type: dell.nodes.ansible.Executor
+    properties:
+      <<: *ansible_common_properties
+      inventory_proxy_settings:
+        <<: *inventory_proxy_settings
+      sources:
+        all:
+          hosts:
+            win:
+              <<: *ansible_data_stream_designer_vm_host
+              ansible_host:
+                get_attribute: [SELF, inventory_proxy_settings, connection, ip]
+              ansible_port:
+                get_attribute: [SELF, inventory_proxy_settings, connection, port]
+    interfaces:
+      dell.interfaces.lifecycle:
+        create:
+          <<: *ansible_common_run_config
+          inputs:
+            <<: *ansible_common_inputs
+            playbook_path: *prepare_iis_phase1_playbook_path
+            run_data:
+              vm_user_name:
+                get_attribute:
+                  [data_stream_designer_vm, capabilities, vm_username]
+              installation_dir:
+                get_input: ds_installation_dir
+              sm_ip:
+                get_attribute:
+                  [subscription_manager_vm, capabilities, vm_public_ip]
+              ad_ip:
+                get_attribute:
+                  [application_designer_vm, capabilities, vm_public_ip]
+              ds_ip:
+                get_attribute:
+                  [data_stream_designer_vm, capabilities, vm_public_ip]
+              sm_hostname:
+                get_attribute:
+                  [get_subscription_manager_hostname, hostname]
+              ad_hostname:
+                get_attribute:
+                  [get_application_designer_hostname, hostname]
+              ds_hostname:
+                get_attribute:
+                  [get_data_stream_designer_hostname, hostname]
+              website_zip_url:
+                get_input: data_stream_designer_zip_url
+              website_zip_filename:
+                get_input: data_stream_designer_zip_filename
+              ms_dotnet_core_hosting_bundle_url:
+                get_input: ms_dotnet_core_hosting_bundle_url
+              ms_dotnet_core_hosting_bundle_filename:
+                get_input: ms_dotnet_core_hosting_bundle_filename
+              url_rewrite_module_url:
+                get_input: url_rewrite_module_url
+              url_rewrite_module_filename:
+                get_input: url_rewrite_module_filename
+              ms_edge_url:
+                get_input: ms_edge_url
+              ms_edge_filename:
+                get_input: ms_edge_filename
+              artifact_validate_certs:
+                get_input: win_get_url_validate_certs
+              artifact_headers:
+                get_secret:
+                  get_input: artifact_download_headers_secret_name
+              censor_sensitive_data:
+                get_input: ansible_censor_sensitive_data
+            sensitive_keys:
+              - ansible_password
+              - ansible_user
+              - ansible_ssh_private_key_file
+              - artifact_headers
+        start:
+          <<: *ansible_common_run_config
+          inputs:
+            <<: *ansible_common_inputs
+            playbook_path: *prepare_iis_phase2_playbook_path
+            run_data:
+              vm_user_name:
+                get_attribute:
+                  [data_stream_designer_vm, capabilities, vm_username]
+              installation_dir:
+                get_input: ds_installation_dir
+            sensitive_keys:
+              - ansible_password
+              - ansible_user
+              - ansible_ssh_private_key_file
+        poststart:
+          <<: *ansible_common_run_config
+          inputs:
+            <<: *ansible_common_inputs
+            playbook_path: *prepare_iis_phase3_playbook_path
+            run_data:
+              vm_user_name:
+                get_attribute:
+                  [data_stream_designer_vm, capabilities, vm_username]
+              installation_dir:
+                get_input: ds_installation_dir
+              url_rewrite_module_filename:
+                get_input: url_rewrite_module_filename
+              ms_edge_filename:
+                get_input: ms_edge_filename
+              node_instance_id:
+                get_attribute: [generate_ca, node_instance_id]
+              signing_cert_name:
+                get_input: signing_cert_name
+              website_name:
+                concat:
+                  - { get_input: company_name }
+                  - "-DS"
+              tenant_name:
+                get_sys: [tenant, name]
+              deployment_id:
+                get_sys: [deployment, id]
+            sensitive_keys:
+              - ansible_password
+              - ansible_user
+              - ansible_ssh_private_key_file
+    relationships:
+      - type: dell.relationships.depends_on
+        target: generate_ca
+
+  install_data_stream_designer_website:
+    type: dell.nodes.ansible.Executor
+    properties:
+      <<: *ansible_common_properties
+      inventory_proxy_settings:
+        <<: *inventory_proxy_settings
+      sources:
+        all:
+          hosts:
+            data_stream_designer_vm:
+              <<: *ansible_data_stream_designer_vm_host
+              ansible_host:
+                get_attribute: [SELF, inventory_proxy_settings, connection, ip]
+              ansible_port:
+                get_attribute: [SELF, inventory_proxy_settings, connection, port]
+    interfaces:
+      dell.interfaces.lifecycle:
+        start:
+          <<: *ansible_common_run_config
+          inputs:
+            <<: *ansible_common_inputs
+            playbook_path: *ds_website_playbook_path
+            run_data:
+              vm_user_name:
+                get_attribute:
+                  [data_stream_designer_vm, capabilities, vm_username]
+              installation_dir:
+                get_input: ds_installation_dir
+              zip_filename:
+                get_input: data_stream_designer_zip_filename
+              ds_product_id:
+                get_attribute:
+                  [upgrade_database, upgrade_db_output, DSProductId]
+              ds_product_key:
+                get_attribute:
+                  [upgrade_database, upgrade_db_output, DSProductKey]
+              ds_hostname:
+                get_attribute:
+                  [get_data_stream_designer_hostname, hostname]
+              sm_hostname:
+                get_attribute:
+                  [get_subscription_manager_hostname, hostname]
+              sql_ip:
+                get_attribute:
+                  [mssql_server_vm, capabilities, vm_public_ip]
+              xmpro_password:
+                get_attribute: [mssql_xmpro_password_secret, password]
+              ms_dotnet_core_hosting_bundle_filename:
+                get_input: ms_dotnet_core_hosting_bundle_filename
+              censor_sensitive_data:
+                get_input: ansible_censor_sensitive_data
+            sensitive_keys:
+              - ansible_password
+              - ansible_user
+              - ansible_ssh_private_key_file
+              - xmpro_password
+    relationships:
+      - type: dell.relationships.depends_on
+        target: mssql_xmpro_password_secret
+      - type: dell.relationships.depends_on
+        target: install_subscription_manager_website
+      - type: dell.relationships.depends_on
+        target: upgrade_database
+      - type: dell.relationships.depends_on
+        target: prepare_data_stream_designer_iis

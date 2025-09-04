@@ -1,0 +1,9 @@
+---
+- name: Check if the Installation Directory already exists
+  win_shell: Test-Path -Path "{{ installation_dir }}"
+  register: directory_exists
+
+- name: Remove the Installation Directory if it exists
+  win_shell: Remove-Item -Path "{{ installation_dir }}" -Recurse -Force
+  become: true
+  when: "'True' in directory_exists.stdout"

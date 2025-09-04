@@ -1,0 +1,12 @@
+---
+- name: Set Windows Environment Variables
+  ansible.windows.win_shell: |
+    $envVarKey = "{{ item.key }}"
+    $envVarValue = "{{ item.value }}"
+    [System.Environment]::SetEnvironmentVariable(`
+      $envVarKey, `
+      $envVarValue, `
+      [System.EnvironmentVariableTarget]::Machine)
+  loop: "{{ environment_variables | dict2items }}"
+  become: true
+  no_log: "{{ censor_sensitive_data }}"

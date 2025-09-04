@@ -1,0 +1,33 @@
+imports:
+  - plugin:edge-plugin
+
+node_templates:
+
+  binary_image:
+    type: dell.nodes.nativeedge.template.BinaryImage
+    properties:
+      binary_image_config:
+        artifact:
+          path:
+            get_input: binary_image_artifact_url
+          username:
+            get_input: binary_image_artifact_username
+          access_token:
+            get_secret:
+              get_input: binary_image_artifact_access_token_secret_name
+        version:
+          get_input: binary_image_version
+    interfaces:
+      dell.interfaces.lifecycle:
+        precreate:
+          implementation:
+            edge.nativeedge_plugin.tasks.validate_binary_image_config
+        create:
+          implementation:
+            edge.nativeedge_plugin.tasks.upload_binary
+        delete:
+          implementation:
+            edge.nativeedge_plugin.tasks.delete_binary
+    relationships:
+      - type: dell.relationships.depends_on
+        target: validate_secrets

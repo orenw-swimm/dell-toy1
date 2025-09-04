@@ -1,0 +1,284 @@
+inputs:
+
+  vm_template:
+    type: string
+    hidden: false
+    allow_update: false
+    display_label: Template Name
+    description: |
+      Name of the Virtual Machine Template in vSphere.
+      Cannot contain leading or trailing spaces.
+    constraints:
+    - pattern: ^(?!\s)(?!.*\s$).*$
+      error_message: Cannot contain leading or trailing spaces.
+    display:
+      group: vsphere
+      index: 1
+
+  hostname_prefix:
+    type: string
+    hidden: false
+    allow_update: false
+    display_label: Hostname Prefix
+    description: |
+      The hostname prefix to apply to all Virtual Machines.
+      Additional identification will be added to the hostname to make
+      sure it is unique.
+      Cannot contain "_", characters other than: letters (a-z, A-Z),
+      numbers (0-9), or hyphens (-). Can be up to 63 characters long.
+    default: XMPro
+    constraints:
+    - pattern: ^(?!-)[a-zA-Z0-9-]{1,63}(?<!-)$
+      error_message: |
+        Must be letters (a-z, A-Z), numbers (0-9), or hyphens (-).
+        No more than 64 characters.
+    display:
+      group: vsphere
+      index: 5
+
+  vm_user_name:
+    type: string
+    hidden: false
+    allow_update: false
+    display_label: Deployment User
+    description: |
+      Name of deployment user in the Virtual Machine template in vSphere.
+      Cannot contain leading or trailing spaces.
+    default: Administrator
+    constraints:
+    - pattern: ^(?!\s)(?!.*\s$).*$
+      error_message: Cannot contain leading or trailing spaces.
+    display:
+      group: vsphere
+      index: 10
+
+  storage_disk_size:
+    type: integer
+    hidden: true
+    allow_update: false
+    display_label: Storage Disk Size [GB]
+    description: Additional disks size in GB.
+    default: 0
+
+  disks_count:
+    type: integer
+    hidden: true
+    allow_update: false
+    display_label: Storage Disks Count
+    description: Number of additional disks attached to the Virtual Machine.
+    default: 0
+    constraints:
+    - in_range:
+      - 0
+      - 1
+
+  storage_disk_provisioning:
+    type: string
+    hidden: true
+    allow_update: false
+    display_label: Storage Disk Provisioning Type
+    description: Storage Disk provisioning type for Virtual Machine in vSphere.
+    default: thin
+    constraints:
+    - valid_values:
+      - thick
+      - thin
+
+  datastore_name:
+    type: string
+    hidden: false
+    allow_update: false
+    display_label: Datastore
+    description: |
+      Name of the Datastore to use with the Virtual Machine.
+      Cannot contain leading or trailing spaces.
+      Example: VxRail-Virtual-SAN-Datastore-123abc
+    constraints:
+    - pattern: ^(?!\s)(?!.*\s$).*$
+      error_message: |
+        Cannot contain leading or trailing spaces.
+        Example: VxRail-Virtual-SAN-Datastore-123abc
+    display:
+      group: vsphere
+      index: 15
+
+  resource_pool_name:
+    type: string
+    hidden: false
+    allow_update: false
+    display_label: Resource Pool
+    description: Name of the Resource Pool in vSphere.
+    constraints:
+    - pattern: ^(?!\s)(?!.*\s$).*$
+      error_message: Cannot contain leading or trailing spaces.
+    display:
+      group: vsphere
+      index: 20
+
+  vm_folder:
+    type: string
+    hidden: false
+    allow_update: false
+    display_label: VM Folder
+    description: |
+      Name of the folder in vSphere to deploy a Virtual Machine in to.
+      Cannot contain leading or trailing spaces.
+    constraints:
+    - pattern: ^(?!\s)(?!.*\s$).*$
+      error_message: Cannot contain leading or trailing spaces.
+    display:
+      group: vsphere
+      index: 25
+
+  disk_provisioning:
+    type: string
+    hidden: false
+    allow_update: false
+    display_label: Disk Provisioning Type
+    description: OS Disk provisioning type for Virtual Machine in vSphere.
+    default: thin
+    constraints:
+    - valid_values:
+      - thickLazyZeroed
+      - thickEagerZeroed
+      - thin
+    display:
+      group: vsphere
+      index: 30
+
+  network:
+    type: dell.datatypes.vsphere.Network
+    hidden: false
+    allow_update: false
+    display_label: Network Details
+    description: |
+      Which network to deploy the Virtual Machine on.
+    display:
+      group: vsphere
+      index: 35
+
+  cidr:
+    type: string
+    hidden: false
+    exclusive_with: dhcp
+    allow_update: false
+    display_label: Network CIDR
+    description: |
+      Network subnet range in form of NETWORK_IP/NETMASK_PREFIX
+      Example: 172.16.0.0/21
+    required: true
+    constraints:
+    - pattern: ^(?:((25[0-5]|2[0-4]\d|1\d\d|\d{1,2})(\.(25[0-5]|2[0-4]\d|1\d\d|\d{1,2})){3})\/(3[0-2]|[12]?\d)|)$
+      error_message: |
+        Invalid format for IP Address in CIDR format.
+        Example: 172.16.0.0/16
+    display:
+      group: vsphere
+      index: 43
+
+  dhcp:
+    type: boolean
+    hidden: false
+    allow_update: false
+    display_label: DHCP
+    description: |
+      Enable to allow IP configuration to be taken from DHCP
+      instead of static IP settings.
+    default: true
+    display:
+      group: vsphere
+      index: 40
+
+  gateway:
+    type: string
+    hidden: false
+    exclusive_with: dhcp
+    allow_update: false
+    display_label: Gateway IP
+    description: |
+      IP address. Example: 172.16.0.1.
+      Only required for static IP deployments, not for DHCP.
+    required: true
+    display:
+      group: vsphere
+      index: 45
+    constraints:
+    - pattern: ^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)\.?\b){4}$|^$
+      error_message: |
+        Invalid format for IP Address.
+        Example: 172.16.0.1
+
+  dns:
+    type: list
+    item_type: string
+    hidden: false
+    exclusive_with: dhcp
+    allow_update: false
+    display_label: DNS Servers
+    description: 'List of IP addresses. Example: ["1.1.1.1", "8.8.8.8"]'
+    required: true
+    display:
+      group: vsphere
+      index: 50
+    default: []
+
+data_types:
+
+  dell.datatypes.vsphere.USBDevice:
+    properties:
+      device_name:
+        type: string
+        description: Host USB Device Name
+        required: true
+      controller_type:
+        type: string
+        description: |
+          USB Controller type associated with USB.
+          Values can be: usb2, usb3
+        required: false
+        default: usb3
+
+  dell.datatypes.vsphere.SerialPort:
+    properties:
+      device_name:
+        type: string
+        description: |
+          Host Serial Port Name.
+          Should be an absolute path: /dev/char/serial/uartX
+        required: true
+
+  dell.datatypes.vsphere.PCIDevice:
+    properties:
+      device_name:
+        type: string
+        description: PCI Passthrough Device Name
+        required: true
+
+  dell.datatypes.vsphere.Network:
+    description: |
+      Environment-agnostic network schema.
+      Supports: vSphere, but also NativeEdge Endpoints
+    properties:
+      name:
+        type: string
+        description: |
+          The name of the network.
+        required: true
+      switch_distributed:
+        type: boolean
+        description: |
+          Determines if this is connected to a distributed port group.
+        required: false
+        default: true
+      management:
+        type: boolean
+        description: |
+          Determines if this is a management network interface.
+        required: false
+        default: true
+      external:
+        type: boolean
+        description: |
+          Determines if this is a external network interface.
+        required: false
+        default: true

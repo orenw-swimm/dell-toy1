@@ -1,0 +1,35 @@
+---
+- name: Start Process with Arguments
+  ansible.windows.win_shell: |
+    $filePath = "{{ installation_dir }}\{{ filename }}"
+    $arguments = "{{ arguments }}"
+    $dataStamp = get-date -Format yyyyMMddTHHmmss
+    $outputPath = "{{ installation_dir }}\{{ filename }}-process-$dataStamp.log"
+    $scriptBlock = {
+      param($filePath, $arguments, $dataStamp, $outputPath)
+      $argumentArray = $arguments -split ' '
+      Start-Process -FilePath "$filePath" -Wait -ArgumentList $argumentArray
+      $filePath | Out-File -FilePath $outputPath
+    }
+    $job = Start-Job `
+      -ScriptBlock $scriptBlock `
+      -ArgumentList (,$filePath, $arguments, $dataStamp, $outputPath)
+    $counter = 0
+    while (-not (Test-Path -Path $outputPath)) {
+      Write-Host "Waiting for the Process to finish..."
+      Start-Sleep -Seconds 10
+      $counter++
+      if ($counter -gt 60) {
+        Write-Host "Process took too long. Exiting."
+        exit 1
+      }
+    }
+    Write-Host "Process finished successfully"
+  args:
+    chdir: "{{ installation_dir }}"
+  register: start_process_result
+  retries: 5
+  delay: 10
+  until: '"Process finished successfully" in start_process_result.stdout'
+  ignore_errors: yes
+  become: true

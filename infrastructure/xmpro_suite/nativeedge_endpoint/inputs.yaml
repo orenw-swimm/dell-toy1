@@ -1,0 +1,236 @@
+inputs:
+
+  binary_image_artifact_url:
+    type: string
+    hidden: true
+    allow_update: false
+    display_label: Virtual Machine Image Repository URL
+    description: |
+      URL of the Image Binary that will be used to create
+      the Virtual Machine.
+      For Subscription Manager, App Designer, Data Stream Designer,
+      and Microsoft SQL Server Virtual Machines.
+    default:
+      get_secret:
+      - get_input: artifact_configuration_secret_name
+      - binary_image_url
+
+  binary_image_artifact_username:
+    type: string
+    hidden: true
+    allow_update: false
+    display_label: Virtual Machine Image Repository User Name
+    description: |
+      User name of the Repository of the Image Binary that will be
+      used to create the Virtual Machine.
+      For Subscription Manager, App Designer, Data Stream Designer,
+      and Microsoft SQL Server Virtual Machines.
+    default:
+      get_secret:
+      - get_input: artifact_configuration_secret_name
+      - binary_image_access_user
+
+  binary_image_artifact_access_token_secret_name:
+    type: list
+    hidden: true
+    allow_update: false
+    display_label: Virtual Machine Image Repository Token Secret Name
+    description: |
+      Name of the secret storing the Token to the Repository of the
+      Image Binary that will be used to create the Virtual Machine.
+      For Subscription Manager, App Designer, Data Stream Designer,
+      and Microsoft SQL Server Virtual Machines.
+    default:
+    - get_input: artifact_configuration_secret_name
+    - binary_image_access_token
+
+  binary_image_version:
+    type: string
+    hidden: true
+    allow_update: false
+    display_label: Virtual Machine Image Version
+    description: |
+      Virtual Machine Image Version that will be used to create
+      the Virtual Machine.
+      For Subscription Manager, App Designer, Data Stream Designer,
+      and Microsoft SQL Server Virtual Machines.
+    default:
+      get_secret:
+      - get_input: artifact_configuration_secret_name
+      - binary_image_version
+
+  hostname_prefix:
+    type: string
+    hidden: false
+    allow_update: false
+    display_label: Hostname Prefix
+    description: |
+      The hostname prefix to apply to all Virtual Machines.
+      Additional identification will be added to the hostname to make
+      sure it is unique.
+      Cannot contain "_", characters other than: letters (a-z, A-Z),
+      numbers (0-9), or hyphens (-). Can be up to 63 characters long.
+    default: XMPro
+    constraints:
+    - pattern: ^(?!-)[a-zA-Z0-9-]{1,63}(?<!-)$
+      error_message: |
+        Must be letters (a-z, A-Z), numbers (0-9), or hyphens (-).
+        No more than 64 characters.
+    display:
+      group: ned
+      index: 5
+
+  os_type:
+    type: string
+    hidden: false
+    allow_update: false
+    display_label: OS Type
+    description: The virtual machine Operating System.
+    default: WIN2019-SERVER
+    constraints:
+    - valid_values:
+      - WIN2019-SERVER
+      - WIN2022-SERVER
+      - WIN-OTHERS
+    display:
+      group: ned
+      index: 10
+
+  hardware_options.vTPM:
+    type: boolean
+    hidden: true
+    allow_update: false
+    display_label: Hardware Options - vTPM
+    description: |
+      Enable vTPM.
+      Required for For Windows 11 OS, optional for other OS.
+    default: false
+
+  hardware_options.secure_boot:
+    type: boolean
+    hidden: true
+    allow_update: false
+    display_label: Hardware Options - Secure Boot
+    description: |
+      Enable secure boot.
+      Required for For Windows 11 OS, optional for other OS.
+    default: false
+
+  hardware_options.firmware_type:
+    type: string
+    hidden: true
+    allow_update: false
+    display_label: Hardware Options - Firmware Type
+    description: |
+      The firmware type configured in the Virtual Machine.
+      For Windows 11 OS this must be UEFI.
+    default: BIOS
+    constraints:
+    - valid_values:
+      - BIOS
+      - UEFI
+
+  enable_management:
+    type: boolean
+    hidden: true
+    allow_update: false
+    display_label: Enable Management
+    description: |
+      Enable management which will create a tap interface for
+      the infrastructure segment.
+    default: true
+
+  segment_name:
+    type: string
+    hidden: false
+    allow_update: true
+    display_label: Bridged Network Name
+    description: Name of the Bridged Network.
+    constraints:
+    - valid_values:
+        jmespath:
+        - extra.hw_core.network.virtualSegment[?type=='BRIDGE'].name
+        - get_inventory:
+            get_environment_capability: ece_service_tag
+    display:
+      group: ned
+      index: 15
+
+  dhcp:
+    type: boolean
+    hidden: false
+    allow_update: false
+    display_label: DHCP
+    description: |
+      Enable to allow IP configuration to be taken from DHCP
+      instead of static IP settings.
+    default: true
+    display:
+      group: ned
+      index: 20
+
+  dns:
+    type: list
+    item_type: string
+    hidden: false
+    exclusive_with: dhcp
+    allow_update: false
+    display_label: DNS Servers
+    description: List of DNS servers addresses.
+    required: true
+    default: []
+    display:
+      group: ned
+      index: 25
+
+  gateway:
+    type: string
+    hidden: false
+    exclusive_with: dhcp
+    allow_update: false
+    display_label: Gateway IP Address
+    description: IP Address of the Network Gateway.
+    required: true
+    constraints:
+    - pattern: ^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)\.?\b){4}$|^$
+      error_message: |
+        Invalid format for IP Address.
+        Example: 172.16.0.1
+    display:
+      group: ned
+      index: 30
+
+  network_settings:
+    type: list
+    item_type: dell.types.nativeedge.VMDeployNetworkSettings
+    hidden: true
+    allow_update: true
+    display_label: Network Settings
+    description: List of VMDeployNetworkSettings.
+    default:
+    - name: VNIC1
+      segment_name:
+        get_input: segment_name
+
+  cloudinit:
+    type: string
+    hidden: true
+    allow_update: false
+    display_label: Cloud Init Config
+    description: |
+      Cloud init cloud config, can be obtained with
+      dell.nodes.CloudInit.CloudConfig
+    required: false
+    default: ''
+
+  iso_files:
+    type: list
+    item_type: string
+    hidden: true
+    allow_update: false
+    display_label: ISO Files
+    description: |
+      List ISO files (references to catalog) to be downloaded before
+      Virtual Machine provisioning.
+    default: []
+    required: false

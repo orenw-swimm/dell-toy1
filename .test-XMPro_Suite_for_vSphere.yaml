@@ -1,0 +1,65 @@
+tosca_definitions_version: dell_1_0
+
+description: >
+  Blueprint creates Windows Virtual Machines in vSphere environment and installs
+  XMPro Software on top of them using Ansible Playbooks.
+
+imports:
+  - dell/types/types.yaml
+
+  # Infrastructure - vSphere VM
+  - infrastructure/xmpro_suite/vsphere/inputs.yaml
+  - infrastructure/xmpro_suite/vsphere/components/mssql_server/inputs.yaml
+  - infrastructure/xmpro_suite/vsphere/components/subscription_manager/inputs.yaml
+  - infrastructure/xmpro_suite/vsphere/components/application_designer/inputs.yaml
+  - infrastructure/xmpro_suite/vsphere/components/data_stream_designer/inputs.yaml
+
+  - tests/infrastructure/xmpro_suite/vsphere/components/mssql_server/blueprint.yaml
+  - tests/infrastructure/xmpro_suite/vsphere/components/subscription_manager/blueprint.yaml
+  - tests/infrastructure/xmpro_suite/vsphere/components/application_designer/blueprint.yaml
+  - tests/infrastructure/xmpro_suite/vsphere/components/data_stream_designer/blueprint.yaml
+
+  # Application - XMPro Suite
+  - application/inputs.yaml
+  - application/inputs_common.yaml
+  - application/mssql_server/inputs.yaml
+  - application/subscription_manager/inputs.yaml
+  - application/application_designer/inputs.yaml
+  - application/data_stream_designer/inputs.yaml
+
+  - tests/application/blueprint.yaml
+  - tests/application/mssql_server/blueprint.yaml
+  - tests/application/subscription_manager/blueprint.yaml
+  - tests/application/application_designer/blueprint.yaml
+  - tests/application/data_stream_designer/blueprint.yaml
+
+  # Outputs
+  - application/outputs.yaml
+  - application/subscription_manager/outputs.yaml
+  - application/application_designer/outputs.yaml
+  - application/data_stream_designer/outputs.yaml
+  - application/mssql_server/outputs.yaml
+
+labels:
+  csys-obj-type:
+    values:
+      - environment
+  target_environment:
+    values:
+      - vsphere
+  vendor:
+    values:
+      - xmpro
+  solution:
+    values:
+      - subscription_manager
+      - application_designer
+      - data_stream_designer
+  version:
+    values:
+      - "4.3.7.0"
+
+blueprint_labels:
+  env:
+    values:
+      - vsphere

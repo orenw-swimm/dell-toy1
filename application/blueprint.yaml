@@ -1,0 +1,55 @@
+imports:
+  - plugin:ansible-plugin?version=>=4.0.0.0
+  - plugin:utilities-plugin?version=>=3.0.0.0
+
+node_templates:
+
+  validate_secrets:
+    type: dell.nodes.SoftwareComponent
+    interfaces:
+      dell.interfaces.lifecycle:
+        create:
+          implementation: application/scripts/validate_secrets.py
+          executor: central_deployment_agent
+          inputs:
+            base_url_secret_name:
+              get_input: artifact_configuration_secret_name
+            json_url_key: artifact_base_url
+            company_admin_password_secret_name:
+              get_input: company_admin_password_secret_name
+            site_admin_password_secret_name:
+              get_input: site_admin_password_secret_name
+        start:
+          implementation: application/scripts/validate_smtp.py
+          executor: central_deployment_agent
+          inputs:
+            smtp_enable:
+              get_input: smtp_enable
+            smtp_password_secret_name:
+              get_input: smtp_password_secret_name
+        stop:
+          implementation: application/scripts/remove_smtp_secret.py
+          executor: central_deployment_agent
+          inputs:
+            smtp_password_secret_created:
+              get_attribute: [SELF, smtp_password_secret_created]
+            smtp_password_secret_name:
+              get_attribute: [SELF, smtp_password_secret_name]
+
+  clean_up:
+    type: dell.nodes.SoftwareComponent
+    interfaces:
+      dell.interfaces.lifecycle:
+        start:
+          implementation: application/scripts/clean_up.py
+          executor: central_deployment_agent
+          inputs:
+            node_instance_id:
+              get_attribute: [generate_ca, node_instance_id]
+    relationships:
+       - type: dell.relationships.depends_on
+         target: install_subscription_manager_website
+       - type: dell.relationships.depends_on
+         target: install_application_designer_website
+       - type: dell.relationships.depends_on
+         target: install_data_stream_designer_website

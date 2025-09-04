@@ -1,0 +1,61 @@
+---
+- name: Create Initial IIS Website - Phase 1
+  hosts: win
+  become_method: runas
+  become_user: "{{ vm_user_name | default('Administrator') }}"
+  gather_facts: false
+  roles:
+  - role: prepare_environment
+    vars:
+      installation_dir: "{{ installation_dir }}"
+
+  - role: update_hosts_file
+    vars:
+      sm_ip: "{{ sm_ip }}"
+      ad_ip: "{{ ad_ip }}"
+      ds_ip: "{{ ds_ip }}"
+      sm_hostname: "{{ sm_hostname }}"
+      ad_hostname: "{{ ad_hostname }}"
+      ds_hostname: "{{ ds_hostname }}"
+
+  - role: download_file
+    vars:
+      artifact_url: "{{ website_zip_url }}"
+      artifact_validate_certs: "{{ artifact_validate_certs }}"
+      artifact_headers: "{{ artifact_headers }}"
+      artifact_target_path: "{{ installation_dir }}\\{{ website_zip_filename }}"
+      censor_sensitive_data: "{{ censor_sensitive_data }}"
+
+  - role: download_file
+    vars:
+      artifact_url: "{{ ms_dotnet_core_hosting_bundle_url }}"
+      artifact_validate_certs: "{{ artifact_validate_certs }}"
+      artifact_headers: "{{ artifact_headers }}"
+      artifact_target_path: "{{ installation_dir }}\\{{ ms_dotnet_core_hosting_bundle_filename }}"
+      censor_sensitive_data: "{{ censor_sensitive_data }}"
+
+  - role: download_file
+    vars:
+      artifact_url: "{{ url_rewrite_module_url }}"
+      artifact_validate_certs: "{{ artifact_validate_certs }}"
+      artifact_headers: "{{ artifact_headers }}"
+      artifact_target_path: "{{ installation_dir }}\\{{ url_rewrite_module_filename }}"
+      censor_sensitive_data: "{{ censor_sensitive_data }}"
+
+  - role: download_file
+    vars:
+      artifact_url: "{{ ms_edge_url }}"
+      artifact_validate_certs: "{{ artifact_validate_certs }}"
+      artifact_headers: "{{ artifact_headers }}"
+      artifact_target_path: "{{ installation_dir }}\\{{ ms_edge_filename }}"
+      censor_sensitive_data: "{{ censor_sensitive_data }}"
+
+  - role: start_process
+    vars:
+      filename: "{{ ms_dotnet_core_hosting_bundle_filename }}"
+      arguments: "/passive /norestart"
+      installation_dir: "{{ installation_dir }}"
+
+  - role: install_webserver
+    vars:
+      installation_dir: "{{ installation_dir }}"

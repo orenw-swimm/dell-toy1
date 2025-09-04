@@ -1,0 +1,48 @@
+---
+- name: Create Certificates Sub-Directory
+  ansible.windows.win_file:
+    path: "{{ installation_dir }}\\certificates"
+    state: directory
+  become: true
+
+- name: Copy CreateSigningCert.cmd Script
+  ansible.windows.win_copy:
+    src: resources/CreateSigningCert.cmd
+    dest: "{{ installation_dir }}\\certificates\\CreateSigningCert.cmd"
+  become: true
+
+- name: Copy GenerateCertificate.ps1 Script
+  ansible.windows.win_copy:
+    src: resources/GenerateCertificate.ps1
+    dest: "{{ installation_dir }}\\certificates\\GenerateCertificate.ps1"
+  become: true
+
+- name: Generate Signing Certificate
+  ansible.windows.win_shell: >
+    .\CreateSigningCert.cmd {{ signing_cert_name }}
+  args:
+    chdir: "{{ installation_dir }}\\certificates"
+  become: true
+
+- name: Generate Certificate
+  ansible.windows.win_shell: |
+    & .\GenerateCertificate.ps1 `
+      -adHostName {{ ad_hostname }} `
+      -dsHostName {{ ds_hostname }}
+  args:
+    chdir: "{{ installation_dir }}\\certificates"
+  become: true
+
+- name: Download XMPro Signing Cert PFX
+  ansible.builtin.fetch:
+    src: "{{ installation_dir }}\\certificates\\{{ signing_cert_name }}.pfx"
+    dest:
+      "/opt/manager/resources/deployments/{{ tenant_name }}/{{ deployment_id }}/"
+    flat: yes
+
+- name: Download XMPro Cert PFX
+  ansible.builtin.fetch:
+    src: "{{ installation_dir }}\\certificates\\XMProCertificate.pfx"
+    dest:
+      "/opt/manager/resources/deployments/{{ tenant_name }}/{{ deployment_id }}/"
+    flat: yes

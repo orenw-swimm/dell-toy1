@@ -1,0 +1,60 @@
+---
+- name: Alter MSSQL SQL Mode to [SQL]
+  ansible.windows.win_shell: |
+    Invoke-Sqlcmd -ServerInstance "localhost" -Query "EXEC xp_instance_regwrite N'HKEY_LOCAL_MACHINE', N'Software\Microsoft\MSSQLServer\MSSQLServer', N'LoginMode', REG_DWORD, 2;"
+  retries: 5
+  delay: 10
+  until: result.rc == 0
+  register: result
+
+- name: Enable SA User Login
+  ansible.windows.win_shell: |
+    Invoke-Sqlcmd -ServerInstance "localhost" -Query "ALTER LOGIN sa ENABLE;"
+
+- name: Set Sensitive Variables Facts
+  ansible.builtin.set_fact:
+    sa_password: "{{ sa_password }}"
+    xmpro_password: "{{ xmpro_password }}"
+  no_log: "{{ censor_sensitive_data }}"
+
+- name: Configure MS SQL Users
+  ansible.windows.win_shell: |
+    Invoke-Sqlcmd -ServerInstance "localhost" `
+      -Query "ALTER LOGIN sa WITH PASSWORD = '{{ sa_password }}';"
+    Invoke-Sqlcmd -ServerInstance "localhost" `
+      -Query "CREATE LOGIN XMProUser WITH PASSWORD = '{{ xmpro_password }}';"
+    Invoke-Sqlcmd -ServerInstance "localhost" `
+      -Query "ALTER SERVER ROLE dbcreator ADD MEMBER XMProUser;"
+  ignore_errors: true
+  no_log: "{{ censor_sensitive_data }}"
+  register: configure_sql_users_result
+
+- name: Print Stdout From Configure MS SQL Users
+  ansible.builtin.debug:
+    msg: '{{ configure_sql_users_result.stdout | replace(sa_password, "*****") | replace(xmpro_password, "*****") }}'
+  when: configure_sql_users_result is failed
+
+- name: Print Stderr From Configure MS SQL Users
+  ansible.builtin.debug:
+    msg: '{{ configure_sql_users_result.stderr | replace(sa_password, "*****") | replace(xmpro_password, "*****") }}'
+  when: configure_sql_users_result is failed
+
+- name: Error in Configure MS SQL Users
+  ansible.builtin.fail:
+    msg: >
+      Configure MS SQL Users failed.
+      Please see the error messages above.
+  when: configure_sql_users_result is failed
+
+- name: Stop MSSQL Server service
+  win_service:
+    name: 'MSSQLSERVER'
+    state: stopped
+  register: service_result
+  ignore_errors: true
+
+- name: Start MSSQL Server service
+  win_service:
+    name: 'MSSQLSERVER'
+    state: started
+  when: service_result is changed or service_result is failed

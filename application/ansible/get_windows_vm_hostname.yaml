@@ -1,0 +1,21 @@
+---
+- name: Get Windows VM Hostname
+  hosts: win
+  gather_facts: false
+  tasks:
+    - name: Get the VM Hostname
+      ansible.windows.win_shell: >
+        hostname
+      register: hostname
+
+    - name: Create a directory
+      ansible.builtin.file:
+        path: /tmp/{{ node_instance_id }}
+        state: directory
+      delegate_to: localhost
+
+    - name: Create a temp file with VM Hostname
+      ansible.builtin.copy:
+        content: "{{ hostname.stdout | trim }}"
+        dest: /tmp/{{ node_instance_id }}/vm_hostname.txt
+      delegate_to: localhost

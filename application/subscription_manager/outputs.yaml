@@ -1,0 +1,28 @@
+capabilities:
+
+# Subscription Manager VM
+
+  subscription_manager_vm_ip:
+    description: Subscription Manager Virtual Machine IP Address
+    value:
+      get_attribute: [subscription_manager_vm, capabilities, vm_public_ip]
+
+  subscription_manager_vm_name:
+    description: Subscription Manager Virtual Machine Name
+    value:
+      get_attribute: [subscription_manager_vm, capabilities, vm_name]
+
+  subscription_manager_vm_hostname:
+    description: Subscription Manager Virtual Machine Hostname
+    value:
+      get_attribute: [get_subscription_manager_hostname, hostname]
+
+  subscription_manager_vm_user_name:
+    description: Subscription Manager Virtual Machine User Name
+    value:
+      get_attribute: [subscription_manager_vm, capabilities, vm_username]
+
+  subscription_manager_vm_user_password_secret_name:
+    description: Subscription Manager Virtual Machine User Password Secret Name
+    value:
+      get_input: sm_vm_password_secret_name

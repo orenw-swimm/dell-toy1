@@ -1,0 +1,28 @@
+capabilities:
+
+# Application Designer VM
+
+  application_designer_vm_ip:
+    description: Application Designer Virtual Machine IP Address
+    value:
+      get_attribute: [application_designer_vm, capabilities, vm_public_ip]
+
+  application_designer_vm_name:
+    description: Application Designer Virtual Machine Name
+    value:
+      get_attribute: [application_designer_vm, capabilities, vm_name]
+
+  application_designer_vm_hostname:
+    description: Application Designer Virtual Machine Hostname
+    value:
+      get_attribute: [get_application_designer_hostname, hostname]
+
+  application_designer_vm_user_name:
+    description: Application Designer Virtual Machine User Name
+    value:
+      get_attribute: [application_designer_vm, capabilities, vm_username]
+
+  application_designer_vm_user_password_secret_name:
+    description: Application Designer Virtual Machine User Password Secret Name
+    value:
+      get_input: ad_vm_password_secret_name

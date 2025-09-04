@@ -1,0 +1,33 @@
+---
+- name: Generate XMPro CA
+  hosts: win
+  become_method: runas
+  become_user: "{{ vm_user_name | default('Administrator') }}"
+  gather_facts: false
+  roles:
+  - role: prepare_environment
+    vars:
+      installation_dir: "{{ installation_dir }}"
+
+  - role: download_file
+    vars:
+      artifact_url: "{{ openssl_url }}"
+      artifact_validate_certs: "{{ artifact_validate_certs }}"
+      artifact_headers: "{{ artifact_headers }}"
+      artifact_target_path: "{{ installation_dir }}\\{{ openssl_filename }}"
+      censor_sensitive_data: "{{ censor_sensitive_data }}"
+
+  - role: install_msi
+    vars:
+      filename: "{{ openssl_filename }}"
+      installation_dir: "{{ installation_dir }}"
+
+  - role: generate_ca
+    vars:
+      installation_dir: "{{ installation_dir }}"
+      node_instance_id: "{{ node_instance_id }}"
+      signing_cert_name: "{{ signing_cert_name }}"
+      ad_hostname: "{{ ad_hostname }}"
+      ds_hostname: "{{ ds_hostname }}"
+      tenant_name: "{{ tenant_name }}"
+      deployment_id: "{{ deployment_id }}"

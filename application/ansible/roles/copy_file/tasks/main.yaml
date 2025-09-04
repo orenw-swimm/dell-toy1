@@ -1,0 +1,6 @@
+---
+- name: Copy a file
+  ansible.windows.win_copy:
+    src: "{{ file_source_path }}"
+    dest: "{{ file_target_path }}"
+  become: true

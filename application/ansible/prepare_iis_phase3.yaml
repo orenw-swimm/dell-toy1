@@ -1,0 +1,37 @@
+---
+- name: Create Initial IIS Website - Phase 3
+  hosts: win
+  become_method: runas
+  become_user: "{{ vm_user_name | default('Administrator') }}"
+  gather_facts: false
+  roles:
+  - role: install_webserver_configuration
+    vars:
+      installation_dir: "{{ installation_dir }}"
+
+  - role: install_msi
+    vars:
+      filename: "{{ url_rewrite_module_filename }}"
+      installation_dir: "{{ installation_dir }}"
+
+  - role: install_exe
+    vars:
+      filename: "{{ ms_edge_filename }}"
+      process: "msedge"
+      installation_dir: "{{ installation_dir }}"
+
+  - role: install_certificate
+    vars:
+      installation_dir: "{{ installation_dir }}"
+      node_instance_id: "{{ node_instance_id }}"
+      signing_cert_name: "{{ signing_cert_name }}"
+      website_name: "{{ website_name }}"
+      tenant_name: "{{ tenant_name }}"
+      deployment_id: "{{ deployment_id }}"
+
+  - role: create_iis_website
+    vars:
+      website_name: "{{ website_name }}"
+      website_path: "C:\\inetpub\\wwwroot"
+
+  - role: restart_iis_service

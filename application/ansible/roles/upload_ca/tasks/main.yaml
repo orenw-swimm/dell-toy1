@@ -1,0 +1,11 @@
+---
+- name: Certificates Sub-Directory
+  ansible.windows.win_file:
+    path: "{{ installation_dir }}\\certificates"
+    state: directory
+  become: true
+
+- name: Upload CA Key
+  ansible.builtin.copy:
+    src: "/tmp/{{ node_instance_id }}/XMProCA.cer"
+    dest: "{{ installation_dir }}\\certificates\\XMProCA.cer"

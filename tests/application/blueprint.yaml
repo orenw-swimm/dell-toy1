@@ -1,0 +1,43 @@
+node_templates:
+
+  validate_secrets:
+    type: dell.nodes.ApplicationModule
+    interfaces:
+      dell.interfaces.lifecycle:
+        start:
+          implementation: tests/utilities/set_runtime_properties.py
+          executor: central_deployment_agent
+          inputs:
+            installer_url: "test"
+            smtp_password_secret_created: false
+            smtp_password_secret_name:
+              get_input: smtp_password_secret_name
+        poststart:
+          implementation: tests/utilities/verify_inputs.py
+          executor: central_deployment_agent
+          inputs:
+            base_url_secret_name:
+              get_input: artifact_configuration_secret_name
+            json_url_key: artifact_base_url
+            smtp_enable:
+              get_input: smtp_enable
+            smtp_password_secret_name:
+              get_input: smtp_password_secret_name
+
+  clean_up:
+    type: dell.nodes.ApplicationModule
+    interfaces:
+      dell.interfaces.lifecycle:
+        poststart:
+          implementation: tests/utilities/verify_inputs.py
+          executor: central_deployment_agent
+          inputs:
+            node_instance_id:
+              get_attribute: [generate_ca, node_instance_id]
+    relationships:
+       - type: dell.relationships.depends_on
+         target: install_subscription_manager_website
+       - type: dell.relationships.depends_on
+         target: install_application_designer_website
+       - type: dell.relationships.depends_on
+         target: install_data_stream_designer_website

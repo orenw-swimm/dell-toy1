@@ -1,0 +1,175 @@
+imports:
+  - plugin:ansible-plugin?version=>=4.0.0.0
+
+dsl_definitions:
+
+  ansible_common_inputs: &ansible_common_inputs
+    ansible_external_venv: { get_input: ansible_external_venv }
+    sources: { get_property: [SELF, sources] }
+    sensitive_keys: { get_property: [SELF, sensitive_keys] }
+    log_stdout: { get_input: ansible_log_stdout }
+    store_facts: false
+    debug_level: 0
+
+  stream_host_vm: &ansible_stream_host_vm_host
+    ansible_user:
+      get_attribute: [stream_host_vm, capabilities, vm_username]
+    ansible_password:
+      get_secret: { get_input: vm_password_secret_name }
+    ansible_connection:
+      winrm
+    ansible_winrm_scheme:
+      http
+    ansible_winrm_transport:
+      ntlm
+    ansible_winrm_operation_timeout_sec:
+      180
+    ansible_winrm_read_timeout_sec:
+      360
+
+  stream_host_playbook_path: &stream_host_playbook_path
+    application/ansible/install_stream_host.yaml
+
+node_templates:
+
+  validate_secrets:
+    type: dell.nodes.SoftwareComponent
+    interfaces:
+      dell.interfaces.lifecycle:
+        start:
+          implementation: application/scripts/validate_secrets_sh.py
+          executor: central_deployment_agent
+          inputs:
+            base_url_secret_name:
+              get_input: artifact_configuration_secret_name
+            json_url_key: artifact_base_url
+        poststart:
+          implementation: application/scripts/verify_sh_number.py
+          executor: central_deployment_agent
+          inputs:
+            stream_host_instance_number_for_default:
+              get_input: stream_host_instance_number_for_default
+            additional_instances_for_non_default_collection:
+              get_input: additional_instances_for_non_default_collection
+
+  sh_instances_information:
+    type: dell.nodes.SoftwareComponent
+    interfaces:
+      dell.interfaces.lifecycle:
+        start:
+          implementation: application/scripts/sh_instances.py
+          executor: central_deployment_agent
+          inputs:
+            stream_host_instance_number_for_default:
+              get_input: stream_host_instance_number_for_default
+            machine_name:
+              get_attribute: [stream_host_vm, capabilities, vm_name]
+            additional_instances_for_non_default_collection:
+              get_input: additional_instances_for_non_default_collection
+            server_url:
+              concat:
+                - "https://"
+                - get_capability:
+                    - { get_input: xmpro_suite_deployment_id }
+                    - data_stream_designer_vm_hostname
+                - "/"
+            encryption_key:
+              get_capability:
+                - { get_input: xmpro_suite_deployment_id }
+                - products_deployment_info
+                - DSEncryptionKey
+            default_gateway_collection_id:
+              get_capability:
+                - { get_input: xmpro_suite_deployment_id }
+                - products_deployment_info
+                - CollectionId
+            default_gateway_collection_secret:
+              get_capability:
+                - { get_input: xmpro_suite_deployment_id }
+                - products_deployment_info
+                - CollectionSecret
+    relationships:
+      - type: dell.relationships.depends_on
+        target: stream_host_vm
+
+  install_stream_host:
+    type: dell.nodes.ansible.Executor
+    properties:
+      ansible_external_venv: { get_input: ansible_external_venv }
+      number_of_attempts: 20
+      inventory_proxy_settings:
+        connection:
+          ip:
+            get_attribute: [stream_host_vm, capabilities, vm_host]
+          port:
+            get_attribute: [stream_host_vm, capabilities, vm_winrm_port]
+      sources:
+        all:
+          hosts:
+            win:
+              <<: *ansible_stream_host_vm_host
+              ansible_host:
+                get_attribute: [SELF, inventory_proxy_settings, connection, ip]
+              ansible_port:
+                get_attribute: [SELF, inventory_proxy_settings, connection, port]
+    interfaces:
+      dell.interfaces.lifecycle:
+        start:
+          timeout: 18000
+          max_retries: 20
+          retry_interval: 60
+          implementation: ansible.plugins_ansible.tasks.run
+          inputs:
+            <<: *ansible_common_inputs
+            playbook_path: *stream_host_playbook_path
+            run_data:
+              stream_host_installation_dir:
+                get_input: stream_host_installation_dir
+              stream_host_service_filename:
+                get_input: stream_host_service_filename
+              vm_user_name:
+                get_attribute: [stream_host_vm, capabilities, vm_username]
+              stream_host_installer_url:
+                get_input: stream_host_installer_url
+              artifact_validate_certs:
+                get_input: win_get_url_validate_certs
+              artifact_headers:
+                get_secret:
+                  get_input: artifact_download_headers_secret_name
+              censor_sensitive_data:
+                get_input: ansible_censor_sensitive_data
+              stream_host_services_information:
+                get_attribute:
+                  [sh_instances_information, stream_host_services_information]
+              sh_services:
+                get_attribute: [sh_instances_information, sh_services]
+              ds_hostname:
+                get_capability:
+                  - { get_input: xmpro_suite_deployment_id }
+                  - data_stream_designer_vm_hostname
+              ds_ip:
+                get_capability:
+                  - { get_input: xmpro_suite_deployment_id }
+                  - data_stream_designer_vm_ip
+              cert_path:
+                get_secret:
+                  get_capability:
+                    - { get_input: xmpro_suite_deployment_id }
+                    - xmpro_certificate_secret_name
+              ms_dotnet_core_hosting_bundle_filename:
+                get_input: ms_dotnet_core_hosting_bundle_filename
+              ms_dotnet_core_hosting_bundle_url:
+                get_input: ms_dotnet_core_hosting_bundle_url
+              sh_msi_exec_file:
+                get_input: sh_msi_exec_file
+            sensitive_keys:
+              - ansible_password
+              - ansible_user
+              - ansible_ssh_private_key_file
+              - artifact_headers
+              - cert_path
+    relationships:
+      - type: dell.relationships.depends_on
+        target: stream_host_vm
+      - type: dell.relationships.depends_on
+        target: sh_instances_information

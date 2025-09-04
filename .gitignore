@@ -1,0 +1,11 @@
+
+.idea/inspectionProfiles/Project_Default.xml
+*.iml
+
+.idea/inspectionProfiles/profiles_settings.xml
+.idea/misc.xml
+.idea/modules.xml
+.idea/vcs.xml
+.vscode/PythonImportHelper-v2-Completion.json
+
+*.zip

@@ -1,0 +1,58 @@
+---
+- name: Set Sensitive Variables Facts
+  ansible.builtin.set_fact:
+    xmpro_password: "{{ xmpro_password }}"
+    company_admin_password: "{{ company_admin_password }}"
+    site_admin_password: "{{ site_admin_password }}"
+  no_log: "{{ censor_sensitive_data }}"
+
+- name: Run UpgradeDatabase PowerShell Script
+  ansible.windows.win_shell: |
+    & .\UpgradeDatabase.ps1                                           `
+      -targetServerName          "localhost"                          `
+      -targetUser                "XMProUser"                          `
+      -targetPassword            "{{ xmpro_password }}"               `
+      -DSUrl                     "{{ ds_url }}"                       `
+      -ADUrl                     "{{ ad_url }}"                       `
+      -AIUrl                     "ai-not-available"                   `
+      -NBUrl                     "xmproNotebook-not-available"        `
+      -CompanyName               "{{ company_name }}"                 `
+      -FirstName                 "{{ first_name }}"                   `
+      -LastName                  "{{ last_name }}"                    `
+      -Email                     "{{ email }}"                        `
+      -CompanyAdminPassword      "{{ company_admin_password }}"       `
+      -SiteAdminPassword         "{{ site_admin_password }}"          `
+      -EnableAi                  false                                `
+      -smDbMigrationsExeFilePath ".\XMIdentity.Database.Console.exe"  `
+      -dsDbMigrationsExeFilePath ".\XMIoT.Database.Console.exe"       `
+      -adDbMigrationsExeFilePath ".\AppDesigner.Database.Console.exe" `
+      -aiDbMigrationsExeFilePath ".\AIDesigner.Database.Console.exe"
+  args:
+    chdir: "{{ installation_dir }}"
+  become: true
+  ignore_errors: true
+  register: upgrade_database_script
+  no_log: "{{ censor_sensitive_data }}"
+
+- name: Print Stdout From Run UpgradeDatabase PowerShell Script
+  ansible.builtin.debug:
+    msg: '{{ upgrade_database_script.stdout | replace(xmpro_password, "*****") | replace(company_admin_password, "*****") | replace(site_admin_password, "*****") }}'
+  when: upgrade_database_script is failed
+
+- name: Print Stderr From Run UpgradeDatabase PowerShell Script
+  ansible.builtin.debug:
+    msg: '{{ upgrade_database_script.stderr | replace(xmpro_password, "*****") | replace(company_admin_password, "*****") | replace(site_admin_password, "*****") }}'
+  when: upgrade_database_script is failed
+
+- name: Error in Run UpgradeDatabase PowerShell Script
+  ansible.builtin.fail:
+    msg: >
+      Run UpgradeDatabase PowerShell Script failed.
+      Please see the error messages above.
+  when: upgrade_database_script is failed
+
+- name: Save Output Locally
+  ansible.builtin.fetch:
+    src: "{{ installation_dir }}\\deployment_script_outputs.txt"
+    dest: "/tmp/{{ node_instance_id }}/"
+    flat: yes
