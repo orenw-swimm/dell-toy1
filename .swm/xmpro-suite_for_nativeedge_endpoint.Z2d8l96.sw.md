@@ -40,7 +40,6 @@ flowchart RL
 ## 1.2 Architecture Diagram
 
 
-
 # 2 Blueprint Structure
 
 ## 2.1 Blueprint Diagram
@@ -269,7 +268,7 @@ class infrastructure_xmpro_suite_nativeedge_endpoint_components_application_desi
 - ./tests/integration_tests_inputs
 - ./tests/utilities
 
-## 3 Prerequisites
+# 3 Prerequisites
 
 ## 3.1 Sizing
 
