@@ -480,6 +480,34 @@ After a successful deployment, you will get the following capabilities:
 
 | Name | Description |
 |---|---|
+| <SwmToken path="/application/outputs.yaml" pos="5:1:1" line-data="  xmpro_website_endpoint:">`xmpro_website_endpoint`</SwmToken> | XMPro Subscription Manager Website Endpoint |
+| <SwmToken path="/application/outputs.yaml" pos="13:1:1" line-data="  site_admin_username:">`site_admin_username`</SwmToken> | XMPro Site Admin User Name |
+| <SwmToken path="/application/outputs.yaml" pos="17:1:1" line-data="  site_admin_password_secret_name:">`site_admin_password_secret_name`</SwmToken> | XMPro Site Admin Password Secret Name |
+| <SwmToken path="/application/outputs.yaml" pos="22:1:1" line-data="  company_admin_username:">`company_admin_username`</SwmToken> | XMPro Company Admin User Name |
+| <SwmToken path="/application/outputs.yaml" pos="33:1:1" line-data="  company_admin_password_secret_name:">`company_admin_password_secret_name`</SwmToken> | XMPro Company Admin Password Secret Name |
+| <SwmToken path="/application/outputs.yaml" pos="38:1:1" line-data="  products_deployment_info:">`products_deployment_info`</SwmToken> | XMPro Platform Deployment Information |
+| <SwmToken path="/application/outputs.yaml" pos="43:1:1" line-data="  xmpro_certificate_secret_name:">`xmpro_certificate_secret_name`</SwmToken> | Name of the secret containing XMPro Certificate Path for Stream Hosts |
+| <SwmToken path="/application/outputs.yaml" pos="49:1:1" line-data="  mssql_server_sa_password_secret_name:">`mssql_server_sa_password_secret_name`</SwmToken> | Name of the secret containing the password set for the<br>System Administrator (sa) user of the Microsoft SQL Server |
+| <SwmToken path="/application/outputs.yaml" pos="56:1:1" line-data="  mssql_server_xmpro_password_secret_name:">`mssql_server_xmpro_password_secret_name`</SwmToken> | Name of the secret containing the password set for the<br>XMPro user of the Microsoft SQL Server |
+| <SwmToken path="/application/subscription_manager/outputs.yaml" pos="5:1:1" line-data="  subscription_manager_vm_ip:">`subscription_manager_vm_ip`</SwmToken> | Subscription Manager Virtual Machine IP Address |
+| <SwmToken path="/application/subscription_manager/outputs.yaml" pos="10:1:1" line-data="  subscription_manager_vm_name:">`subscription_manager_vm_name`</SwmToken> | Subscription Manager Virtual Machine Name |
+| <SwmToken path="/application/subscription_manager/outputs.yaml" pos="15:1:1" line-data="  subscription_manager_vm_hostname:">`subscription_manager_vm_hostname`</SwmToken> | Subscription Manager Virtual Machine Hostname |
+| <SwmToken path="/application/subscription_manager/outputs.yaml" pos="20:1:1" line-data="  subscription_manager_vm_user_name:">`subscription_manager_vm_user_name`</SwmToken> | Subscription Manager Virtual Machine User Name |
+| <SwmToken path="/application/subscription_manager/outputs.yaml" pos="25:1:1" line-data="  subscription_manager_vm_user_password_secret_name:">`subscription_manager_vm_user_password_secret_name`</SwmToken> | Subscription Manager Virtual Machine User Password Secret Name |
+| <SwmToken path="/application/application_designer/outputs.yaml" pos="5:1:1" line-data="  application_designer_vm_ip:">`application_designer_vm_ip`</SwmToken> | Application Designer Virtual Machine IP Address |
+| <SwmToken path="/application/application_designer/outputs.yaml" pos="10:1:1" line-data="  application_designer_vm_name:">`application_designer_vm_name`</SwmToken> | Application Designer Virtual Machine Name |
+| <SwmToken path="/application/application_designer/outputs.yaml" pos="15:1:1" line-data="  application_designer_vm_hostname:">`application_designer_vm_hostname`</SwmToken> | Application Designer Virtual Machine Hostname |
+| <SwmToken path="/application/application_designer/outputs.yaml" pos="20:1:1" line-data="  application_designer_vm_user_name:">`application_designer_vm_user_name`</SwmToken> | Application Designer Virtual Machine User Name |
+| <SwmToken path="/application/application_designer/outputs.yaml" pos="25:1:1" line-data="  application_designer_vm_user_password_secret_name:">`application_designer_vm_user_password_secret_name`</SwmToken> | Application Designer Virtual Machine User Password Secret Name |
+| <SwmToken path="/application/data_stream_designer/outputs.yaml" pos="5:1:1" line-data="  data_stream_designer_vm_ip:">`data_stream_designer_vm_ip`</SwmToken> | Data Stream Designer Virtual Machine IP Address |
+| <SwmToken path="/application/data_stream_designer/outputs.yaml" pos="10:1:1" line-data="  data_stream_designer_vm_name:">`data_stream_designer_vm_name`</SwmToken> | Data Stream Designer Virtual Machine Name |
+| <SwmToken path="/application/data_stream_designer/outputs.yaml" pos="15:1:1" line-data="  data_stream_designer_vm_hostname:">`data_stream_designer_vm_hostname`</SwmToken> | Data Stream Designer Virtual Machine Hostname |
+| <SwmToken path="/application/data_stream_designer/outputs.yaml" pos="20:1:1" line-data="  data_stream_designer_vm_user_name:">`data_stream_designer_vm_user_name`</SwmToken> | Data Stream Designer Virtual Machine User Name |
+| <SwmToken path="/application/data_stream_designer/outputs.yaml" pos="25:1:1" line-data="  data_stream_designer_vm_user_password_secret_name:">`data_stream_designer_vm_user_password_secret_name`</SwmToken> | Data Stream Designer Virtual Machine User Password Secret Name |
+| <SwmToken path="/application/mssql_server/outputs.yaml" pos="5:1:1" line-data="  microsoft_sql_vm_ip:">`microsoft_sql_vm_ip`</SwmToken> | Microsoft SQL Server Virtual Machine IP Address |
+| <SwmToken path="/application/mssql_server/outputs.yaml" pos="10:1:1" line-data="  microsoft_sql_vm_name:">`microsoft_sql_vm_name`</SwmToken> | Microsoft SQL Server Virtual Machine Name |
+| <SwmToken path="/application/mssql_server/outputs.yaml" pos="15:1:1" line-data="  microsoft_sql_vm_user_name:">`microsoft_sql_vm_user_name`</SwmToken> | Microsoft SQL Server Virtual Machine User Name |
+| <SwmToken path="/application/mssql_server/outputs.yaml" pos="20:1:1" line-data="  microsoft_sql_vm_user_password_secret_name:">`microsoft_sql_vm_user_password_secret_name`</SwmToken> | Microsoft SQL Server Virtual Machine User Password Secret Name |
 
 
 # 8 Interaction Diagram for Native Edge Endpoint Installation
