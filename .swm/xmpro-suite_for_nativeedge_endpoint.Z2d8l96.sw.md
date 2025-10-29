@@ -43,7 +43,7 @@ flowchart RL
 
 # 2 Blueprint Structure
 
-# 2.1 Blueprint Diagram
+## 2.1 Blueprint Diagram
 
 ```mermaid
 %%{init: { 'themeVariables': { 'lineColor': 'transparent', 'arrowheadColor': 'transparent' } }}%%
@@ -125,8 +125,151 @@ class infrastructure_xmpro_suite_nativeedge_endpoint_components_application_desi
 ```
 
 ## 2.2 Blueprint Directory Structure
-### todo, no mapping
 
+- ./
+- ./application
+- ./application/ansible
+- ./application/ansible/resources
+- ./application/ansible/roles
+- ./application/ansible/roles/clean_up_environment
+- ./application/ansible/roles/clean_up_environment/defaults
+- ./application/ansible/roles/clean_up_environment/tasks
+- ./application/ansible/roles/configure_mssql_mode
+- ./application/ansible/roles/configure_mssql_mode/defaults
+- ./application/ansible/roles/configure_mssql_mode/tasks
+- ./application/ansible/roles/copy_file
+- ./application/ansible/roles/copy_file/defaults
+- ./application/ansible/roles/copy_file/tasks
+- ./application/ansible/roles/create_iis_website
+- ./application/ansible/roles/create_iis_website/defaults
+- ./application/ansible/roles/create_iis_website/tasks
+- ./application/ansible/roles/download_file
+- ./application/ansible/roles/download_file/defaults
+- ./application/ansible/roles/download_file/tasks
+- ./application/ansible/roles/extract_iis_zip
+- ./application/ansible/roles/extract_iis_zip/defaults
+- ./application/ansible/roles/extract_iis_zip/tasks
+- ./application/ansible/roles/generate_ca
+- ./application/ansible/roles/generate_ca/defaults
+- ./application/ansible/roles/generate_ca/tasks
+- ./application/ansible/roles/install_certificate
+- ./application/ansible/roles/install_certificate/defaults
+- ./application/ansible/roles/install_certificate/tasks
+- ./application/ansible/roles/install_exe
+- ./application/ansible/roles/install_exe/defaults
+- ./application/ansible/roles/install_exe/tasks
+- ./application/ansible/roles/install_msi
+- ./application/ansible/roles/install_msi/defaults
+- ./application/ansible/roles/install_msi/tasks
+- ./application/ansible/roles/install_mssql
+- ./application/ansible/roles/install_mssql/defaults
+- ./application/ansible/roles/install_mssql/tasks
+- ./application/ansible/roles/install_stream_host
+- ./application/ansible/roles/install_stream_host/defaults
+- ./application/ansible/roles/install_stream_host/tasks
+- ./application/ansible/roles/install_webserver
+- ./application/ansible/roles/install_webserver_configuration
+- ./application/ansible/roles/install_webserver_configuration/defaults
+- ./application/ansible/roles/install_webserver_configuration/tasks
+- ./application/ansible/roles/install_webserver_opt_features
+- ./application/ansible/roles/install_webserver_opt_features/defaults
+- ./application/ansible/roles/install_webserver_opt_features/tasks
+- ./application/ansible/roles/install_webserver/defaults
+- ./application/ansible/roles/install_webserver/tasks
+- ./application/ansible/roles/open_port
+- ./application/ansible/roles/open_port/defaults
+- ./application/ansible/roles/open_port/tasks
+- ./application/ansible/roles/open_website_in_browser
+- ./application/ansible/roles/open_website_in_browser/defaults
+- ./application/ansible/roles/open_website_in_browser/tasks
+- ./application/ansible/roles/prepare_environment
+- ./application/ansible/roles/prepare_environment/defaults
+- ./application/ansible/roles/prepare_environment/tasks
+- ./application/ansible/roles/prepare_sm_structure
+- ./application/ansible/roles/prepare_sm_structure/defaults
+- ./application/ansible/roles/prepare_sm_structure/tasks
+- ./application/ansible/roles/prepare_sm_webconfig
+- ./application/ansible/roles/prepare_sm_webconfig/defaults
+- ./application/ansible/roles/prepare_sm_webconfig/tasks
+- ./application/ansible/roles/reboot_machine
+- ./application/ansible/roles/reboot_machine/defaults
+- ./application/ansible/roles/reboot_machine/tasks
+- ./application/ansible/roles/restart_iis_service
+- ./application/ansible/roles/restart_iis_service/defaults
+- ./application/ansible/roles/restart_iis_service/tasks
+- ./application/ansible/roles/set_env_variables
+- ./application/ansible/roles/set_env_variables/defaults
+- ./application/ansible/roles/set_env_variables/tasks
+- ./application/ansible/roles/start_process
+- ./application/ansible/roles/start_process/defaults
+- ./application/ansible/roles/start_process/tasks
+- ./application/ansible/roles/stream_host_certificate
+- ./application/ansible/roles/stream_host_certificate/defaults
+- ./application/ansible/roles/stream_host_certificate/tasks
+- ./application/ansible/roles/update_hosts_file
+- ./application/ansible/roles/update_hosts_file/defaults
+- ./application/ansible/roles/update_hosts_file/tasks
+- ./application/ansible/roles/upgrade_database
+- ./application/ansible/roles/upgrade_database/defaults
+- ./application/ansible/roles/upgrade_database/tasks
+- ./application/ansible/roles/upload_ca
+- ./application/ansible/roles/upload_ca/defaults
+- ./application/ansible/roles/upload_ca/tasks
+- ./application/ansible/scripts
+- ./application/application_designer
+- ./application/data_stream_designer
+- ./application/mssql_server
+- ./application/scripts
+- ./application/stream_host
+- ./application/subscription_manager
+- ./infrastructure
+- ./infrastructure/common
+- ./infrastructure/common/scripts
+- ./infrastructure/xmpro_stream_host
+- ./infrastructure/xmpro_stream_host/nativeedge_endpoint
+- ./infrastructure/xmpro_stream_host/vsphere
+- ./infrastructure/xmpro_suite
+- ./infrastructure/xmpro_suite/nativeedge_endpoint
+- ./infrastructure/xmpro_suite/nativeedge_endpoint/components
+- ./infrastructure/xmpro_suite/nativeedge_endpoint/components/application_designer
+- ./infrastructure/xmpro_suite/nativeedge_endpoint/components/data_stream_designer
+- ./infrastructure/xmpro_suite/nativeedge_endpoint/components/mssql_server
+- ./infrastructure/xmpro_suite/nativeedge_endpoint/components/subscription_manager
+- ./infrastructure/xmpro_suite/vsphere
+- ./infrastructure/xmpro_suite/vsphere/components
+- ./infrastructure/xmpro_suite/vsphere/components/application_designer
+- ./infrastructure/xmpro_suite/vsphere/components/data_stream_designer
+- ./infrastructure/xmpro_suite/vsphere/components/mssql_server
+- ./infrastructure/xmpro_suite/vsphere/components/subscription_manager
+- ./tests
+- ./tests/application
+- ./tests/application/application_designer
+- ./tests/application/data_stream_designer
+- ./tests/application/mssql_server
+- ./tests/application/stream_host
+- ./tests/application/subscription_manager
+- ./tests/example_inputs
+- ./tests/infrastructure
+- ./tests/infrastructure/xmpro_stream_host
+- ./tests/infrastructure/xmpro_stream_host/nativeedge_endpoint
+- ./tests/infrastructure/xmpro_stream_host/vsphere
+- ./tests/infrastructure/xmpro_suite
+- ./tests/infrastructure/xmpro_suite/nativeedge_endpoint
+- ./tests/infrastructure/xmpro_suite/nativeedge_endpoint/components
+- ./tests/infrastructure/xmpro_suite/nativeedge_endpoint/components/application_designer
+- ./tests/infrastructure/xmpro_suite/nativeedge_endpoint/components/data_stream_designer
+- ./tests/infrastructure/xmpro_suite/nativeedge_endpoint/components/mssql_server
+- ./tests/infrastructure/xmpro_suite/nativeedge_endpoint/components/subscription_manager
+- ./tests/infrastructure/xmpro_suite/vsphere
+- ./tests/infrastructure/xmpro_suite/vsphere/components
+- ./tests/infrastructure/xmpro_suite/vsphere/components/application_designer
+- ./tests/infrastructure/xmpro_suite/vsphere/components/data_stream_designer
+- ./tests/infrastructure/xmpro_suite/vsphere/components/mssql_server
+- ./tests/infrastructure/xmpro_suite/vsphere/components/subscription_manager
+- ./tests/integration_tests_inputs
+- ./tests/utilities
+
+## 3 Prerequisites
 
 ## 3.1 Sizing
 
@@ -324,55 +467,34 @@ Each inputs file is imported into the main blueprint so this distribution is not
 - smtp_enable → <SwmToken path="/application/blueprint.yaml" pos="27:4:4" line-data="              get_input: smtp_enable">`smtp_enable`</SwmToken>
 - smtp_password_secret_name → <SwmToken path="/application/blueprint.yaml" pos="29:4:4" line-data="              get_input: smtp_password_secret_name">`smtp_password_secret_name`</SwmToken>
 
-# 6 Unstall Workflow
-### todo, no mapping
+# 6 Uninstall Workflow
+
+## 6.1 Uninstall Workflow Execution Steps
+### TODO
+
+## 6.2 Uninstall Workflow Execution Operations
+### TODO
 
 # 7 Deployment Capabilities and Outputs
 After a successful deployment, you will get the following capabilities:
 
 | Name | Description |
 |---|---|
-| <SwmToken path="/application/outputs.yaml" pos="5:1:1" line-data="  xmpro_website_endpoint:">`xmpro_website_endpoint`</SwmToken> | XMPro Subscription Manager Website Endpoint |
-| <SwmToken path="/application/outputs.yaml" pos="13:1:1" line-data="  site_admin_username:">`site_admin_username`</SwmToken> | XMPro Site Admin User Name |
-| <SwmToken path="/application/outputs.yaml" pos="17:1:1" line-data="  site_admin_password_secret_name:">`site_admin_password_secret_name`</SwmToken> | XMPro Site Admin Password Secret Name |
-| <SwmToken path="/application/outputs.yaml" pos="22:1:1" line-data="  company_admin_username:">`company_admin_username`</SwmToken> | XMPro Company Admin User Name |
-| <SwmToken path="/application/outputs.yaml" pos="33:1:1" line-data="  company_admin_password_secret_name:">`company_admin_password_secret_name`</SwmToken> | XMPro Company Admin Password Secret Name |
-| <SwmToken path="/application/outputs.yaml" pos="38:1:1" line-data="  products_deployment_info:">`products_deployment_info`</SwmToken> | XMPro Platform Deployment Information |
-| <SwmToken path="/application/outputs.yaml" pos="43:1:1" line-data="  xmpro_certificate_secret_name:">`xmpro_certificate_secret_name`</SwmToken> | Name of the secret containing XMPro Certificate Path for Stream Hosts |
-| <SwmToken path="/application/outputs.yaml" pos="49:1:1" line-data="  mssql_server_sa_password_secret_name:">`mssql_server_sa_password_secret_name`</SwmToken> | Name of the secret containing the password set for the<br>System Administrator (sa) user of the Microsoft SQL Server |
-| <SwmToken path="/application/outputs.yaml" pos="56:1:1" line-data="  mssql_server_xmpro_password_secret_name:">`mssql_server_xmpro_password_secret_name`</SwmToken> | Name of the secret containing the password set for the<br>XMPro user of the Microsoft SQL Server |
-| <SwmToken path="/application/subscription_manager/outputs.yaml" pos="5:1:1" line-data="  subscription_manager_vm_ip:">`subscription_manager_vm_ip`</SwmToken> | Subscription Manager Virtual Machine IP Address |
-| <SwmToken path="/application/subscription_manager/outputs.yaml" pos="10:1:1" line-data="  subscription_manager_vm_name:">`subscription_manager_vm_name`</SwmToken> | Subscription Manager Virtual Machine Name |
-| <SwmToken path="/application/subscription_manager/outputs.yaml" pos="15:1:1" line-data="  subscription_manager_vm_hostname:">`subscription_manager_vm_hostname`</SwmToken> | Subscription Manager Virtual Machine Hostname |
-| <SwmToken path="/application/subscription_manager/outputs.yaml" pos="20:1:1" line-data="  subscription_manager_vm_user_name:">`subscription_manager_vm_user_name`</SwmToken> | Subscription Manager Virtual Machine User Name |
-| <SwmToken path="/application/subscription_manager/outputs.yaml" pos="25:1:1" line-data="  subscription_manager_vm_user_password_secret_name:">`subscription_manager_vm_user_password_secret_name`</SwmToken> | Subscription Manager Virtual Machine User Password Secret Name |
-| <SwmToken path="/application/application_designer/outputs.yaml" pos="5:1:1" line-data="  application_designer_vm_ip:">`application_designer_vm_ip`</SwmToken> | Application Designer Virtual Machine IP Address |
-| <SwmToken path="/application/application_designer/outputs.yaml" pos="10:1:1" line-data="  application_designer_vm_name:">`application_designer_vm_name`</SwmToken> | Application Designer Virtual Machine Name |
-| <SwmToken path="/application/application_designer/outputs.yaml" pos="15:1:1" line-data="  application_designer_vm_hostname:">`application_designer_vm_hostname`</SwmToken> | Application Designer Virtual Machine Hostname |
-| <SwmToken path="/application/application_designer/outputs.yaml" pos="20:1:1" line-data="  application_designer_vm_user_name:">`application_designer_vm_user_name`</SwmToken> | Application Designer Virtual Machine User Name |
-| <SwmToken path="/application/application_designer/outputs.yaml" pos="25:1:1" line-data="  application_designer_vm_user_password_secret_name:">`application_designer_vm_user_password_secret_name`</SwmToken> | Application Designer Virtual Machine User Password Secret Name |
-| <SwmToken path="/application/data_stream_designer/outputs.yaml" pos="5:1:1" line-data="  data_stream_designer_vm_ip:">`data_stream_designer_vm_ip`</SwmToken> | Data Stream Designer Virtual Machine IP Address |
-| <SwmToken path="/application/data_stream_designer/outputs.yaml" pos="10:1:1" line-data="  data_stream_designer_vm_name:">`data_stream_designer_vm_name`</SwmToken> | Data Stream Designer Virtual Machine Name |
-| <SwmToken path="/application/data_stream_designer/outputs.yaml" pos="15:1:1" line-data="  data_stream_designer_vm_hostname:">`data_stream_designer_vm_hostname`</SwmToken> | Data Stream Designer Virtual Machine Hostname |
-| <SwmToken path="/application/data_stream_designer/outputs.yaml" pos="20:1:1" line-data="  data_stream_designer_vm_user_name:">`data_stream_designer_vm_user_name`</SwmToken> | Data Stream Designer Virtual Machine User Name |
-| <SwmToken path="/application/data_stream_designer/outputs.yaml" pos="25:1:1" line-data="  data_stream_designer_vm_user_password_secret_name:">`data_stream_designer_vm_user_password_secret_name`</SwmToken> | Data Stream Designer Virtual Machine User Password Secret Name |
-| <SwmToken path="/application/mssql_server/outputs.yaml" pos="5:1:1" line-data="  microsoft_sql_vm_ip:">`microsoft_sql_vm_ip`</SwmToken> | Microsoft SQL Server Virtual Machine IP Address |
-| <SwmToken path="/application/mssql_server/outputs.yaml" pos="10:1:1" line-data="  microsoft_sql_vm_name:">`microsoft_sql_vm_name`</SwmToken> | Microsoft SQL Server Virtual Machine Name |
-| <SwmToken path="/application/mssql_server/outputs.yaml" pos="15:1:1" line-data="  microsoft_sql_vm_user_name:">`microsoft_sql_vm_user_name`</SwmToken> | Microsoft SQL Server Virtual Machine User Name |
-| <SwmToken path="/application/mssql_server/outputs.yaml" pos="20:1:1" line-data="  microsoft_sql_vm_user_password_secret_name:">`microsoft_sql_vm_user_password_secret_name`</SwmToken> | Microsoft SQL Server Virtual Machine User Password Secret Name |
 
 
-
-
-
-# Interaction Diagram for Native Edge Endpoint Installation
-### todo, unclear mapping
+# 8 Interaction Diagram for Native Edge Endpoint Installation
+### TODO
 
 - <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/application_designer/blueprint.yaml" pos="51:4:7" line-data="              - &quot;AD-vm-&quot;">`AD-vm-`</SwmToken>
 
 
-# Monitoring and Debugging
-### todo, no mapping
+# 9 Monitoring and Debugging
+### TODO
+
+# 10. Accessing Solution
+
+## 10.1 Open XMPro Website
+### TODO
 
 
 <SwmMeta version="3.0.0" repo-id="Z2l0aHViJTNBJTNBZGVsbC10b3kxJTNBJTNBb3Jlbnctc3dpbW0=" repo-name=" XMPro"><sup>Powered by [Swimm](https://app.swimm.io/)</sup></SwmMeta>
