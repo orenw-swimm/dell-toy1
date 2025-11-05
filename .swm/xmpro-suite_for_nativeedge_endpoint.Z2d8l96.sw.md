@@ -5,9 +5,9 @@ This document is auto-generated from the YAML file <SwmPath>[XMPro_Suite_for_Nat
 
 The <SwmToken path="/XMPro_Suite_for_NativeEdge_Endpoint.yaml" pos="1:0:0" line-data="tosca_definitions_version: dell_1_0">`tosca_definitions_version`</SwmToken> is <SwmToken path="/XMPro_Suite_for_NativeEdge_Endpoint.yaml" pos="1:3:3" line-data="tosca_definitions_version: dell_1_0">`dell_1_0`</SwmToken>.
 
-# 1 Solution Architecture
+# 1. Solution Architecture
 
-## 1.1 Overview
+## 1.1. Overview
 
 - Creates Windows Virtual Machines on NativeEdge Endpoint and installs XMPro Software.
 
@@ -37,12 +37,12 @@ flowchart RL
 
 ```
 
-## 1.2 Architecture Diagram
+## 1.2. Architecture Diagram
 
 
-# 2 Blueprint Structure
+# 2. Blueprint Structure
 
-## 2.1 Blueprint Diagram
+## 2.1. Blueprint Diagram
 
 ```mermaid
 %%{init: { 'themeVariables': { 'lineColor': 'transparent', 'arrowheadColor': 'transparent' } }}%%
@@ -108,8 +108,6 @@ application_subscription_manager_inputs[subscription_manager inputs]
 application_mssql_server_inputs --- application_subscription_manager_inputs
 application_inputs[application inputs]
 application_subscription_manager_inputs --- application_inputs
-application_inputs_common[application inputs]
-application_inputs --- application_inputs_common
 end
 
 linkStyle default stroke:transparent,opacity:0;
@@ -119,11 +117,11 @@ classDef green_cubes fill:#06b606,stroke:#06b606,color:#ffffff;
 classDef yellow_cubes fill:#f1c40f,stroke:#f1c40f,color:#000000;
 classDef dummy_nodes fill:transparent,stroke:transparent,color:transparent;
 class application_application_designer_outputs,application_data_stream_designer_outputs,application_mssql_server_outputs,application_subscription_manager_outputs,application_outputs blue_cubes;
-class application_application_designer_blueprint,application_data_stream_designer_blueprint,application_mssql_server_blueprint,application_subscription_manager_blueprint,application_blueprint,application_application_designer_inputs,application_data_stream_designer_inputs,application_mssql_server_inputs,application_subscription_manager_inputs,application_inputs,application_inputs_common green_cubes;
+class application_application_designer_blueprint,application_data_stream_designer_blueprint,application_mssql_server_blueprint,application_subscription_manager_blueprint,application_blueprint,application_application_designer_inputs,application_data_stream_designer_inputs,application_mssql_server_inputs,application_subscription_manager_inputs,application_inputs green_cubes;
 class infrastructure_xmpro_suite_nativeedge_endpoint_components_application_designer_blueprint,infrastructure_xmpro_suite_nativeedge_endpoint_components_data_stream_designer_blueprint,infrastructure_xmpro_suite_nativeedge_endpoint_components_mssql_server_blueprint,infrastructure_xmpro_suite_nativeedge_endpoint_components_subscription_manager_blueprint,infrastructure_xmpro_suite_nativeedge_endpoint_blueprint,infrastructure_xmpro_suite_nativeedge_endpoint_components_application_designer_inputs,infrastructure_xmpro_suite_nativeedge_endpoint_components_data_stream_designer_inputs,infrastructure_xmpro_suite_nativeedge_endpoint_components_mssql_server_inputs,infrastructure_xmpro_suite_nativeedge_endpoint_components_subscription_manager_inputs,infrastructure_xmpro_suite_nativeedge_endpoint_inputs yellow_cubes;
 ```
 
-## 2.2 Blueprint Directory Structure
+## 2.2. Blueprint Directory Structure
 
 - ./
 - ./application
@@ -221,6 +219,7 @@ class infrastructure_xmpro_suite_nativeedge_endpoint_components_application_desi
 - ./application/scripts
 - ./application/stream_host
 - ./application/subscription_manager
+- ./docs
 - ./infrastructure
 - ./infrastructure/common
 - ./infrastructure/common/scripts
@@ -268,9 +267,9 @@ class infrastructure_xmpro_suite_nativeedge_endpoint_components_application_desi
 - ./tests/integration_tests_inputs
 - ./tests/utilities
 
-# 3 Prerequisites
+# 3. Prerequisites
 
-## 3.1 Sizing
+## 3.1. Sizing
 
 | Component | Default | Minimum |
 |---|---|---|
@@ -279,7 +278,7 @@ class infrastructure_xmpro_suite_nativeedge_endpoint_components_application_desi
 | `mssql_server` | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/mssql_server/inputs.yaml" pos="58:4:4" line-data="    default: 4">`4`</SwmToken> vCPU<br><SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/mssql_server/inputs.yaml" pos="74:4:4" line-data="    default: 16GB">`16GB`</SwmToken> RAM<br>**<SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/mssql_server/inputs.yaml" pos="94:4:4" line-data="    default: 40GB">`40GB`</SwmToken> OS Disk** | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/mssql_server/inputs.yaml" pos="60:6:6" line-data="    - greater_or_equal: 2">`2`</SwmToken> vCPU<br>-<br>**-** |
 | `subscription_manager` | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/subscription_manager/inputs.yaml" pos="58:4:4" line-data="    default: 2">`2`</SwmToken> vCPU<br><SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/subscription_manager/inputs.yaml" pos="74:4:4" line-data="    default: 8GB">`8GB`</SwmToken> RAM<br>**<SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/subscription_manager/inputs.yaml" pos="94:4:4" line-data="    default: 40GB">`40GB`</SwmToken> OS Disk** | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/subscription_manager/inputs.yaml" pos="60:6:6" line-data="    - greater_or_equal: 2">`2`</SwmToken> vCPU<br>-<br>**-** |
 
-## 3.2 Operating System
+## 3.2. Operating System
 
 operating 1 -
 - <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/application_designer/blueprint.yaml" pos="56:4:4" line-data="              get_input: ad_vm_user_name">`ad_vm_user_name`</SwmToken>
@@ -305,7 +304,7 @@ Operating System -
 
 
 
-## 3.3 Artifacts and Binaries
+## 3.3. Artifacts and Binaries
 
 - <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/blueprint.yaml" pos="7:4:12" line-data="    type: dell.nodes.nativeedge.template.BinaryImage">`dell.nodes.nativeedge.template.BinaryImage`</SwmToken>
 
@@ -315,7 +314,7 @@ Operating System -
 
 4. ====not supported yet====
 
-## 3.4 Secrets
+## 3.4. Secrets
 
 The following secrets need to be created before the deployment installation:
 
@@ -331,13 +330,13 @@ The following secrets need to be created before the deployment installation:
 | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/subscription_manager/inputs.yaml" pos="19:1:1" line-data="  sm_vm_password_secret_name:">`sm_vm_password_secret_name`</SwmToken> | Secret name containing the user password for<br>the Windows Virtual Machine. | password |
 
 
-## 3.5 Plugins
+## 3.5. Plugins
 
 - <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/blueprint.yaml" pos="2:3:7" line-data="  - plugin:edge-plugin">`plugin:edge-plugin`</SwmToken>
 - <SwmToken path="/application/blueprint.yaml" pos="2:3:17" line-data="  - plugin:ansible-plugin?version=>=4.0.0.0">`plugin:ansible-plugin?version=>=4.0.0.0`</SwmToken>
 - <SwmToken path="/application/blueprint.yaml" pos="3:3:17" line-data="  - plugin:utilities-plugin?version=>=3.0.0.0">`plugin:utilities-plugin?version=>=3.0.0.0`</SwmToken>
 
-# 4 Inputs
+# 4. Inputs
 
 All inputs in the blueprint are split into several files for better modularity of particular blueprint sections.
 Each inputs file is imported into the main blueprint so this distribution is not visible to the end user
@@ -351,8 +350,8 @@ Each inputs file is imported into the main blueprint so this distribution is not
 | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/inputs.yaml" pos="83:1:1" line-data="  os_type:">`os_type`</SwmToken> | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/inputs.yaml" pos="87:4:6" line-data="    display_label: OS Type">`OS Type`</SwmToken> | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/inputs.yaml" pos="84:4:4" line-data="    type: string">`string`</SwmToken> | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/inputs.yaml" pos="89:4:6" line-data="    default: WIN2019-SERVER">`WIN2019-SERVER`</SwmToken> | WIN2019-SERVER<br>or<br>WIN2022-SERVER<br>or<br>WIN-OTHERS | The virtual machine Operating System. | - |
 | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/inputs.yaml" pos="143:1:1" line-data="  segment_name:">`segment_name`</SwmToken> | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/inputs.yaml" pos="147:4:8" line-data="    display_label: Bridged Network Name">`Bridged Network Name`</SwmToken> | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/inputs.yaml" pos="144:4:4" line-data="    type: string">`string`</SwmToken> | - | extra.hw_core.network.virtualSegment[?type=='BRIDGE'].name<br>get_inventory.get_environment_capability: extra.hw_core.network.virtualSegment | Name of the Bridged Network. | - |
 | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/inputs.yaml" pos="159:1:1" line-data="  dhcp:">`dhcp`</SwmToken> | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/inputs.yaml" pos="163:4:4" line-data="    display_label: DHCP">`DHCP`</SwmToken> | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/inputs.yaml" pos="160:4:4" line-data="    type: boolean">`boolean`</SwmToken> | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/inputs.yaml" pos="167:4:4" line-data="    default: true">`true`</SwmToken> | - | Enable to allow IP configuration to be taken from DHCP<br>instead of static IP settings. | - |
-| <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/inputs.yaml" pos="172:1:1" line-data="  dns:">`dns`</SwmToken> | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/inputs.yaml" pos="178:4:6" line-data="    display_label: DNS Servers">`DNS Servers`</SwmToken> | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/inputs.yaml" pos="173:4:4" line-data="    type: list">`list`</SwmToken> | [] | - | List of DNS servers addresses. | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/inputs.yaml" pos="176:4:4" line-data="    exclusive_with: dhcp">`dhcp`</SwmToken> |
-| <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/inputs.yaml" pos="186:1:1" line-data="  gateway:">`gateway`</SwmToken> | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/inputs.yaml" pos="191:4:8" line-data="    display_label: Gateway IP Address">`Gateway IP Address`</SwmToken> | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/inputs.yaml" pos="187:4:4" line-data="    type: string">`string`</SwmToken> | - | pattern: ^((25[0-5]\|(2[0-4]\|1\d\|[1-9]\|)\d)\.?\b){4}$\|^$ | IP Address of the Network Gateway. | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/inputs.yaml" pos="189:4:4" line-data="    exclusive_with: dhcp">`dhcp`</SwmToken> |
+| <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/inputs.yaml" pos="172:1:1" line-data="  dns:">`dns`</SwmToken> | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/inputs.yaml" pos="178:4:6" line-data="    display_label: DNS Servers">`DNS Servers`</SwmToken> | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/inputs.yaml" pos="173:4:4" line-data="    type: list">`list`</SwmToken> | [] | - | List of DNS servers addresses. | Will be shown only when dhcp flag is set to false |
+| <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/inputs.yaml" pos="186:1:1" line-data="  gateway:">`gateway`</SwmToken> | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/inputs.yaml" pos="191:4:8" line-data="    display_label: Gateway IP Address">`Gateway IP Address`</SwmToken> | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/inputs.yaml" pos="187:4:4" line-data="    type: string">`string`</SwmToken> | - | pattern: ^((25[0-5]\|(2[0-4]\|1\d\|[1-9]\|)\d)\.?\b){4}$\|^$ | IP Address of the Network Gateway. | Will be shown only when dhcp flag is set to false |
 
 
 ## 4.1.2. MSSQL Infrastructure Inputs
@@ -365,9 +364,9 @@ Each inputs file is imported into the main blueprint so this distribution is not
 | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/mssql_server/inputs.yaml" pos="65:1:1" line-data="  db_memory_size:">`db_memory_size`</SwmToken> | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/mssql_server/inputs.yaml" pos="69:4:12" line-data="    display_label: Microsoft SQL Server Memory Size">`Microsoft SQL Server Memory Size`</SwmToken> | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/mssql_server/inputs.yaml" pos="66:4:4" line-data="    type: string">`string`</SwmToken> | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/mssql_server/inputs.yaml" pos="74:4:4" line-data="    default: 16GB">`16GB`</SwmToken> | pattern: \d+(\.\d+)?(KB\|MB\|GB\|TB\|PB\|EB\|ZB\|YB) | Memory size with unit [KB,MB,GB,TB,PB,EB,ZB,YB].<br>See https://documentation.xmpro.com/resources/sizing-guideline<br>for recommendations. | - |
 | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/mssql_server/inputs.yaml" pos="85:1:1" line-data="  db_os_disk_size:">`db_os_disk_size`</SwmToken> | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/mssql_server/inputs.yaml" pos="89:4:14" line-data="    display_label: Microsoft SQL Server OS Disk Size">`Microsoft SQL Server OS Disk Size`</SwmToken> | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/mssql_server/inputs.yaml" pos="86:4:4" line-data="    type: string">`string`</SwmToken> | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/mssql_server/inputs.yaml" pos="94:4:4" line-data="    default: 40GB">`40GB`</SwmToken> | pattern: \d+(\.\d+)?(KB\|MB\|GB\|TB\|PB\|EB\|ZB\|YB) | Storage size with unit [KB,MB,GB,TB,PB,EB,ZB,YB].<br>See https://documentation.xmpro.com/resources/sizing-guideline<br>for recommendations. | - |
 | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/mssql_server/inputs.yaml" pos="105:1:1" line-data="  db_disk:">`db_disk`</SwmToken> | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/mssql_server/inputs.yaml" pos="109:4:14" line-data="    display_label: Microsoft SQL Server Endpoint Datastore Path">`Microsoft SQL Server Endpoint Datastore Path`</SwmToken> | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/mssql_server/inputs.yaml" pos="106:4:4" line-data="    type: string">`string`</SwmToken> | - | - | Deployment datastore path on target endpoint.<br>Available datastores can be retrieved from the endpoint screen. | - |
-| <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/mssql_server/inputs.yaml" pos="123:1:1" line-data="  db_static_ip:">`db_static_ip`</SwmToken> | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/mssql_server/inputs.yaml" pos="128:4:18" line-data="    display_label: Microsoft SQL Server Static IP and Mask Suffix">`Microsoft SQL Server Static IP and Mask Suffix`</SwmToken> | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/mssql_server/inputs.yaml" pos="124:4:4" line-data="    type: string">`string`</SwmToken> | - | pattern: ^(?:((25[0-5]\|2[0-4]\d\|1\d\d\|\d{1,2})(\.(25[0-5]\|2[0-4]\d\|1\d\d\|\d{1,2})){3})\/(3[0-2]\|[12]?\d)\|)$ | IP address and suffix. Example: 172.16.0.1/16.<br>Only required for static IP deployments, not for DHCP. | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/mssql_server/inputs.yaml" pos="126:4:4" line-data="    exclusive_with: dhcp">`dhcp`</SwmToken> |
-| <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/mssql_server/inputs.yaml" pos="142:1:1" line-data="  db_dns:">`db_dns`</SwmToken> | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/mssql_server/inputs.yaml" pos="148:4:12" line-data="    display_label: Microsoft SQL Server DNS Servers">`Microsoft SQL Server DNS Servers`</SwmToken> | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/mssql_server/inputs.yaml" pos="143:4:4" line-data="    type: list">`list`</SwmToken> | [] | - | List of DNS servers addresses. | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/mssql_server/inputs.yaml" pos="146:4:4" line-data="    exclusive_with: dhcp">`dhcp`</SwmToken> |
-| <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/mssql_server/inputs.yaml" pos="154:1:1" line-data="  db_gateway:">`db_gateway`</SwmToken> | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/mssql_server/inputs.yaml" pos="159:4:14" line-data="    display_label: Microsoft SQL Server Gateway IP Address">`Microsoft SQL Server Gateway IP Address`</SwmToken> | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/mssql_server/inputs.yaml" pos="155:4:4" line-data="    type: string">`string`</SwmToken> | - | - | IP Address of the Network Gateway. | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/mssql_server/inputs.yaml" pos="157:4:4" line-data="    exclusive_with: dhcp">`dhcp`</SwmToken> |
+| <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/mssql_server/inputs.yaml" pos="123:1:1" line-data="  db_static_ip:">`db_static_ip`</SwmToken> | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/mssql_server/inputs.yaml" pos="128:4:18" line-data="    display_label: Microsoft SQL Server Static IP and Mask Suffix">`Microsoft SQL Server Static IP and Mask Suffix`</SwmToken> | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/mssql_server/inputs.yaml" pos="124:4:4" line-data="    type: string">`string`</SwmToken> | - | pattern: ^(?:((25[0-5]\|2[0-4]\d\|1\d\d\|\d{1,2})(\.(25[0-5]\|2[0-4]\d\|1\d\d\|\d{1,2})){3})\/(3[0-2]\|[12]?\d)\|)$ | IP address and suffix. Example: 172.16.0.1/16.<br>Only required for static IP deployments, not for DHCP. | Will be shown only when dhcp flag is set to false |
+| <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/mssql_server/inputs.yaml" pos="142:1:1" line-data="  db_dns:">`db_dns`</SwmToken> | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/mssql_server/inputs.yaml" pos="148:4:12" line-data="    display_label: Microsoft SQL Server DNS Servers">`Microsoft SQL Server DNS Servers`</SwmToken> | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/mssql_server/inputs.yaml" pos="143:4:4" line-data="    type: list">`list`</SwmToken> | [] | - | List of DNS servers addresses. | Will be shown only when dhcp flag is set to false |
+| <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/mssql_server/inputs.yaml" pos="154:1:1" line-data="  db_gateway:">`db_gateway`</SwmToken> | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/mssql_server/inputs.yaml" pos="159:4:14" line-data="    display_label: Microsoft SQL Server Gateway IP Address">`Microsoft SQL Server Gateway IP Address`</SwmToken> | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/mssql_server/inputs.yaml" pos="155:4:4" line-data="    type: string">`string`</SwmToken> | - | - | IP Address of the Network Gateway. | Will be shown only when dhcp flag is set to false |
 
 
 ## 4.1.3. Subscription Manager Inputs
@@ -380,9 +379,9 @@ Each inputs file is imported into the main blueprint so this distribution is not
 | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/subscription_manager/inputs.yaml" pos="65:1:1" line-data="  sm_memory_size:">`sm_memory_size`</SwmToken> | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/subscription_manager/inputs.yaml" pos="69:4:10" line-data="    display_label: Subscription Manager Memory Size">`Subscription Manager Memory Size`</SwmToken> | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/subscription_manager/inputs.yaml" pos="66:4:4" line-data="    type: string">`string`</SwmToken> | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/subscription_manager/inputs.yaml" pos="74:4:4" line-data="    default: 8GB">`8GB`</SwmToken> | pattern: \d+(\.\d+)?(KB\|MB\|GB\|TB\|PB\|EB\|ZB\|YB) | Memory size with unit [KB,MB,GB,TB,PB,EB,ZB,YB].<br>See https://documentation.xmpro.com/resources/sizing-guideline<br>for recommendations. | - |
 | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/subscription_manager/inputs.yaml" pos="85:1:1" line-data="  sm_os_disk_size:">`sm_os_disk_size`</SwmToken> | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/subscription_manager/inputs.yaml" pos="89:4:12" line-data="    display_label: Subscription Manager OS Disk Size">`Subscription Manager OS Disk Size`</SwmToken> | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/subscription_manager/inputs.yaml" pos="86:4:4" line-data="    type: string">`string`</SwmToken> | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/subscription_manager/inputs.yaml" pos="94:4:4" line-data="    default: 40GB">`40GB`</SwmToken> | pattern: \d+(\.\d+)?(KB\|MB\|GB\|TB\|PB\|EB\|ZB\|YB) | Storage size with unit [KB,MB,GB,TB,PB,EB,ZB,YB].<br>See https://documentation.xmpro.com/resources/sizing-guideline<br>for recommendations. | - |
 | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/subscription_manager/inputs.yaml" pos="105:1:1" line-data="  sm_disk:">`sm_disk`</SwmToken> | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/subscription_manager/inputs.yaml" pos="109:4:12" line-data="    display_label: Subscription Manager Endpoint Datastore Path">`Subscription Manager Endpoint Datastore Path`</SwmToken> | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/subscription_manager/inputs.yaml" pos="106:4:4" line-data="    type: string">`string`</SwmToken> | - | - | Deployment datastore path on target endpoint.<br>Available datastores can be retrieved from the endpoint screen. | - |
-| <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/subscription_manager/inputs.yaml" pos="123:1:1" line-data="  sm_static_ip:">`sm_static_ip`</SwmToken> | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/subscription_manager/inputs.yaml" pos="128:4:16" line-data="    display_label: Subscription Manager Static IP and Mask Suffix">`Subscription Manager Static IP and Mask Suffix`</SwmToken> | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/subscription_manager/inputs.yaml" pos="124:4:4" line-data="    type: string">`string`</SwmToken> | - | pattern: ^(?:((25[0-5]\|2[0-4]\d\|1\d\d\|\d{1,2})(\.(25[0-5]\|2[0-4]\d\|1\d\d\|\d{1,2})){3})\/(3[0-2]\|[12]?\d)\|)$ | IP address and suffix. Example: 172.16.0.1/16.<br>Only required for static IP deployments, not for DHCP. | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/subscription_manager/inputs.yaml" pos="126:4:4" line-data="    exclusive_with: dhcp">`dhcp`</SwmToken> |
-| <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/subscription_manager/inputs.yaml" pos="142:1:1" line-data="  sm_dns:">`sm_dns`</SwmToken> | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/subscription_manager/inputs.yaml" pos="148:4:10" line-data="    display_label: Subscription Manager DNS Servers">`Subscription Manager DNS Servers`</SwmToken> | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/subscription_manager/inputs.yaml" pos="143:4:4" line-data="    type: list">`list`</SwmToken> | [] | - | List of DNS servers addresses. | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/subscription_manager/inputs.yaml" pos="146:4:4" line-data="    exclusive_with: dhcp">`dhcp`</SwmToken> |
-| <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/subscription_manager/inputs.yaml" pos="154:1:1" line-data="  sm_gateway:">`sm_gateway`</SwmToken> | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/subscription_manager/inputs.yaml" pos="159:4:12" line-data="    display_label: Subscription Manager Gateway IP Address">`Subscription Manager Gateway IP Address`</SwmToken> | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/subscription_manager/inputs.yaml" pos="155:4:4" line-data="    type: string">`string`</SwmToken> | - | - | IP Address of the Network Gateway. | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/subscription_manager/inputs.yaml" pos="157:4:4" line-data="    exclusive_with: dhcp">`dhcp`</SwmToken> |
+| <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/subscription_manager/inputs.yaml" pos="123:1:1" line-data="  sm_static_ip:">`sm_static_ip`</SwmToken> | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/subscription_manager/inputs.yaml" pos="128:4:16" line-data="    display_label: Subscription Manager Static IP and Mask Suffix">`Subscription Manager Static IP and Mask Suffix`</SwmToken> | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/subscription_manager/inputs.yaml" pos="124:4:4" line-data="    type: string">`string`</SwmToken> | - | pattern: ^(?:((25[0-5]\|2[0-4]\d\|1\d\d\|\d{1,2})(\.(25[0-5]\|2[0-4]\d\|1\d\d\|\d{1,2})){3})\/(3[0-2]\|[12]?\d)\|)$ | IP address and suffix. Example: 172.16.0.1/16.<br>Only required for static IP deployments, not for DHCP. | Will be shown only when dhcp flag is set to false |
+| <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/subscription_manager/inputs.yaml" pos="142:1:1" line-data="  sm_dns:">`sm_dns`</SwmToken> | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/subscription_manager/inputs.yaml" pos="148:4:10" line-data="    display_label: Subscription Manager DNS Servers">`Subscription Manager DNS Servers`</SwmToken> | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/subscription_manager/inputs.yaml" pos="143:4:4" line-data="    type: list">`list`</SwmToken> | [] | - | List of DNS servers addresses. | Will be shown only when dhcp flag is set to false |
+| <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/subscription_manager/inputs.yaml" pos="154:1:1" line-data="  sm_gateway:">`sm_gateway`</SwmToken> | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/subscription_manager/inputs.yaml" pos="159:4:12" line-data="    display_label: Subscription Manager Gateway IP Address">`Subscription Manager Gateway IP Address`</SwmToken> | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/subscription_manager/inputs.yaml" pos="155:4:4" line-data="    type: string">`string`</SwmToken> | - | - | IP Address of the Network Gateway. | Will be shown only when dhcp flag is set to false |
 
 ## 4.1.4. Application Designer Inputs
 
@@ -394,9 +393,9 @@ Each inputs file is imported into the main blueprint so this distribution is not
 | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/application_designer/inputs.yaml" pos="65:1:1" line-data="  ad_memory_size:">`ad_memory_size`</SwmToken> | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/application_designer/inputs.yaml" pos="69:4:10" line-data="    display_label: Application Designer Memory Size">`Application Designer Memory Size`</SwmToken> | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/application_designer/inputs.yaml" pos="66:4:4" line-data="    type: string">`string`</SwmToken> | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/application_designer/inputs.yaml" pos="74:4:4" line-data="    default: 16GB">`16GB`</SwmToken> | pattern: \d+(\.\d+)?(KB\|MB\|GB\|TB\|PB\|EB\|ZB\|YB) | Memory size with unit [KB,MB,GB,TB,PB,EB,ZB,YB].<br>See https://documentation.xmpro.com/resources/sizing-guideline<br>for recommendations. | - |
 | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/application_designer/inputs.yaml" pos="85:1:1" line-data="  ad_os_disk_size:">`ad_os_disk_size`</SwmToken> | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/application_designer/inputs.yaml" pos="89:4:12" line-data="    display_label: Application Designer OS Disk Size">`Application Designer OS Disk Size`</SwmToken> | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/application_designer/inputs.yaml" pos="86:4:4" line-data="    type: string">`string`</SwmToken> | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/application_designer/inputs.yaml" pos="94:4:4" line-data="    default: 40GB">`40GB`</SwmToken> | pattern: \d+(\.\d+)?(KB\|MB\|GB\|TB\|PB\|EB\|ZB\|YB) | Storage size with unit [KB,MB,GB,TB,PB,EB,ZB,YB].<br>See https://documentation.xmpro.com/resources/sizing-guideline<br>for recommendations. | - |
 | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/application_designer/inputs.yaml" pos="105:1:1" line-data="  ad_disk:">`ad_disk`</SwmToken> | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/application_designer/inputs.yaml" pos="109:4:12" line-data="    display_label: Application Designer Endpoint Datastore Path">`Application Designer Endpoint Datastore Path`</SwmToken> | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/application_designer/inputs.yaml" pos="106:4:4" line-data="    type: string">`string`</SwmToken> | - | - | Deployment datastore path on target endpoint.<br>Available datastores can be retrieved from the endpoint screen. | - |
-| <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/application_designer/inputs.yaml" pos="123:1:1" line-data="  ad_static_ip:">`ad_static_ip`</SwmToken> | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/application_designer/inputs.yaml" pos="128:4:16" line-data="    display_label: Application Designer Static IP and Mask Suffix">`Application Designer Static IP and Mask Suffix`</SwmToken> | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/application_designer/inputs.yaml" pos="124:4:4" line-data="    type: string">`string`</SwmToken> | - | pattern: ^(?:((25[0-5]\|2[0-4]\d\|1\d\d\|\d{1,2})(\.(25[0-5]\|2[0-4]\d\|1\d\d\|\d{1,2})){3})\/(3[0-2]\|[12]?\d)\|)$ | IP address and suffix. Example: 172.16.0.1/16.<br>Only required for static IP deployments, not for DHCP. | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/application_designer/inputs.yaml" pos="126:4:4" line-data="    exclusive_with: dhcp">`dhcp`</SwmToken> |
-| <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/application_designer/inputs.yaml" pos="142:1:1" line-data="  ad_dns:">`ad_dns`</SwmToken> | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/application_designer/inputs.yaml" pos="148:4:10" line-data="    display_label: Application Designer DNS Servers">`Application Designer DNS Servers`</SwmToken> | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/application_designer/inputs.yaml" pos="143:4:4" line-data="    type: list">`list`</SwmToken> | [] | - | List of DNS servers addresses. | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/application_designer/inputs.yaml" pos="146:4:4" line-data="    exclusive_with: dhcp">`dhcp`</SwmToken> |
-| <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/application_designer/inputs.yaml" pos="154:1:1" line-data="  ad_gateway:">`ad_gateway`</SwmToken> | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/application_designer/inputs.yaml" pos="159:4:12" line-data="    display_label: Application Designer Gateway IP Address">`Application Designer Gateway IP Address`</SwmToken> | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/application_designer/inputs.yaml" pos="155:4:4" line-data="    type: string">`string`</SwmToken> | - | - | IP Address of the Network Gateway. | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/application_designer/inputs.yaml" pos="157:4:4" line-data="    exclusive_with: dhcp">`dhcp`</SwmToken> |
+| <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/application_designer/inputs.yaml" pos="123:1:1" line-data="  ad_static_ip:">`ad_static_ip`</SwmToken> | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/application_designer/inputs.yaml" pos="128:4:16" line-data="    display_label: Application Designer Static IP and Mask Suffix">`Application Designer Static IP and Mask Suffix`</SwmToken> | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/application_designer/inputs.yaml" pos="124:4:4" line-data="    type: string">`string`</SwmToken> | - | pattern: ^(?:((25[0-5]\|2[0-4]\d\|1\d\d\|\d{1,2})(\.(25[0-5]\|2[0-4]\d\|1\d\d\|\d{1,2})){3})\/(3[0-2]\|[12]?\d)\|)$ | IP address and suffix. Example: 172.16.0.1/16.<br>Only required for static IP deployments, not for DHCP. | Will be shown only when dhcp flag is set to false |
+| <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/application_designer/inputs.yaml" pos="142:1:1" line-data="  ad_dns:">`ad_dns`</SwmToken> | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/application_designer/inputs.yaml" pos="148:4:10" line-data="    display_label: Application Designer DNS Servers">`Application Designer DNS Servers`</SwmToken> | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/application_designer/inputs.yaml" pos="143:4:4" line-data="    type: list">`list`</SwmToken> | [] | - | List of DNS servers addresses. | Will be shown only when dhcp flag is set to false |
+| <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/application_designer/inputs.yaml" pos="154:1:1" line-data="  ad_gateway:">`ad_gateway`</SwmToken> | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/application_designer/inputs.yaml" pos="159:4:12" line-data="    display_label: Application Designer Gateway IP Address">`Application Designer Gateway IP Address`</SwmToken> | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/application_designer/inputs.yaml" pos="155:4:4" line-data="    type: string">`string`</SwmToken> | - | - | IP Address of the Network Gateway. | Will be shown only when dhcp flag is set to false |
 
 ## 4.1.5. Data Stream Designer Inputs
 
@@ -408,9 +407,9 @@ Each inputs file is imported into the main blueprint so this distribution is not
 | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/application_designer/inputs.yaml" pos="65:1:1" line-data="  ad_memory_size:">`ad_memory_size`</SwmToken> | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/application_designer/inputs.yaml" pos="69:4:10" line-data="    display_label: Application Designer Memory Size">`Application Designer Memory Size`</SwmToken> | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/application_designer/inputs.yaml" pos="66:4:4" line-data="    type: string">`string`</SwmToken> | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/application_designer/inputs.yaml" pos="74:4:4" line-data="    default: 16GB">`16GB`</SwmToken> | pattern: \d+(\.\d+)?(KB\|MB\|GB\|TB\|PB\|EB\|ZB\|YB) | Memory size with unit [KB,MB,GB,TB,PB,EB,ZB,YB].<br>See https://documentation.xmpro.com/resources/sizing-guideline<br>for recommendations. | - |
 | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/application_designer/inputs.yaml" pos="85:1:1" line-data="  ad_os_disk_size:">`ad_os_disk_size`</SwmToken> | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/application_designer/inputs.yaml" pos="89:4:12" line-data="    display_label: Application Designer OS Disk Size">`Application Designer OS Disk Size`</SwmToken> | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/application_designer/inputs.yaml" pos="86:4:4" line-data="    type: string">`string`</SwmToken> | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/application_designer/inputs.yaml" pos="94:4:4" line-data="    default: 40GB">`40GB`</SwmToken> | pattern: \d+(\.\d+)?(KB\|MB\|GB\|TB\|PB\|EB\|ZB\|YB) | Storage size with unit [KB,MB,GB,TB,PB,EB,ZB,YB].<br>See https://documentation.xmpro.com/resources/sizing-guideline<br>for recommendations. | - |
 | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/application_designer/inputs.yaml" pos="105:1:1" line-data="  ad_disk:">`ad_disk`</SwmToken> | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/application_designer/inputs.yaml" pos="109:4:12" line-data="    display_label: Application Designer Endpoint Datastore Path">`Application Designer Endpoint Datastore Path`</SwmToken> | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/application_designer/inputs.yaml" pos="106:4:4" line-data="    type: string">`string`</SwmToken> | - | - | Deployment datastore path on target endpoint.<br>Available datastores can be retrieved from the endpoint screen. | - |
-| <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/application_designer/inputs.yaml" pos="123:1:1" line-data="  ad_static_ip:">`ad_static_ip`</SwmToken> | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/application_designer/inputs.yaml" pos="128:4:16" line-data="    display_label: Application Designer Static IP and Mask Suffix">`Application Designer Static IP and Mask Suffix`</SwmToken> | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/application_designer/inputs.yaml" pos="124:4:4" line-data="    type: string">`string`</SwmToken> | - | pattern: ^(?:((25[0-5]\|2[0-4]\d\|1\d\d\|\d{1,2})(\.(25[0-5]\|2[0-4]\d\|1\d\d\|\d{1,2})){3})\/(3[0-2]\|[12]?\d)\|)$ | IP address and suffix. Example: 172.16.0.1/16.<br>Only required for static IP deployments, not for DHCP. | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/application_designer/inputs.yaml" pos="126:4:4" line-data="    exclusive_with: dhcp">`dhcp`</SwmToken> |
-| <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/application_designer/inputs.yaml" pos="142:1:1" line-data="  ad_dns:">`ad_dns`</SwmToken> | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/application_designer/inputs.yaml" pos="148:4:10" line-data="    display_label: Application Designer DNS Servers">`Application Designer DNS Servers`</SwmToken> | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/application_designer/inputs.yaml" pos="143:4:4" line-data="    type: list">`list`</SwmToken> | [] | - | List of DNS servers addresses. | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/application_designer/inputs.yaml" pos="146:4:4" line-data="    exclusive_with: dhcp">`dhcp`</SwmToken> |
-| <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/application_designer/inputs.yaml" pos="154:1:1" line-data="  ad_gateway:">`ad_gateway`</SwmToken> | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/application_designer/inputs.yaml" pos="159:4:12" line-data="    display_label: Application Designer Gateway IP Address">`Application Designer Gateway IP Address`</SwmToken> | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/application_designer/inputs.yaml" pos="155:4:4" line-data="    type: string">`string`</SwmToken> | - | - | IP Address of the Network Gateway. | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/application_designer/inputs.yaml" pos="157:4:4" line-data="    exclusive_with: dhcp">`dhcp`</SwmToken> |
+| <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/application_designer/inputs.yaml" pos="123:1:1" line-data="  ad_static_ip:">`ad_static_ip`</SwmToken> | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/application_designer/inputs.yaml" pos="128:4:16" line-data="    display_label: Application Designer Static IP and Mask Suffix">`Application Designer Static IP and Mask Suffix`</SwmToken> | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/application_designer/inputs.yaml" pos="124:4:4" line-data="    type: string">`string`</SwmToken> | - | pattern: ^(?:((25[0-5]\|2[0-4]\d\|1\d\d\|\d{1,2})(\.(25[0-5]\|2[0-4]\d\|1\d\d\|\d{1,2})){3})\/(3[0-2]\|[12]?\d)\|)$ | IP address and suffix. Example: 172.16.0.1/16.<br>Only required for static IP deployments, not for DHCP. | Will be shown only when dhcp flag is set to false |
+| <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/application_designer/inputs.yaml" pos="142:1:1" line-data="  ad_dns:">`ad_dns`</SwmToken> | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/application_designer/inputs.yaml" pos="148:4:10" line-data="    display_label: Application Designer DNS Servers">`Application Designer DNS Servers`</SwmToken> | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/application_designer/inputs.yaml" pos="143:4:4" line-data="    type: list">`list`</SwmToken> | [] | - | List of DNS servers addresses. | Will be shown only when dhcp flag is set to false |
+| <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/application_designer/inputs.yaml" pos="154:1:1" line-data="  ad_gateway:">`ad_gateway`</SwmToken> | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/application_designer/inputs.yaml" pos="159:4:12" line-data="    display_label: Application Designer Gateway IP Address">`Application Designer Gateway IP Address`</SwmToken> | <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/application_designer/inputs.yaml" pos="155:4:4" line-data="    type: string">`string`</SwmToken> | - | - | IP Address of the Network Gateway. | Will be shown only when dhcp flag is set to false |
 
 ## 4.2. Application Inputs
 
@@ -432,7 +431,7 @@ Each inputs file is imported into the main blueprint so this distribution is not
 | <SwmToken path="/application/inputs.yaml" pos="193:1:1" line-data="  smtp_enable_ssl:">`smtp_enable_ssl`</SwmToken> | <SwmToken path="/application/inputs.yaml" pos="198:4:6" line-data="    display_label: SMTP SSL">`SMTP SSL`</SwmToken> | <SwmToken path="/application/inputs.yaml" pos="194:4:4" line-data="    type: boolean">`boolean`</SwmToken> | <SwmToken path="/application/inputs.yaml" pos="201:4:4" line-data="    default: true">`true`</SwmToken> | - | If enabled, SMTP connections will use SSL. | Will be shown only when smtp_enable flag is set to true |
 | <SwmToken path="/application/inputs.yaml" pos="206:1:1" line-data="  smtp_from_address:">`smtp_from_address`</SwmToken> | <SwmToken path="/application/inputs.yaml" pos="211:4:14" line-data="    display_label: SMTP Envelope Sender E-Mail Address">`SMTP Envelope Sender E-Mail Address`</SwmToken> | <SwmToken path="/application/inputs.yaml" pos="207:4:4" line-data="    type: string">`string`</SwmToken> | - | pattern: ^(?:[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})?$ | The e-mail address for the SMTP user | Will be shown only when smtp_enable flag is set to true |
 
-## 4.2.2 Microsoft SQL Server Inputs
+## 4.2.2. Microsoft SQL Server Inputs
 
 | Name | Display Label | Type | Default | Constraints | Description | Dependency |
 |---|---|---|---|---|---|---|
@@ -444,7 +443,7 @@ Each inputs file is imported into the main blueprint so this distribution is not
 |---|---|---|---|---|---|---|
 | <SwmToken path="/application/subscription_manager/inputs.yaml" pos="41:1:1" line-data="  openssl_url_internet_connected:">`openssl_url_internet_connected`</SwmToken> | <SwmToken path="/application/subscription_manager/inputs.yaml" pos="47:4:14" line-data="    display_label: OpenSSL Light Win64 MSI File URL">`OpenSSL Light Win64 MSI File URL`</SwmToken> | <SwmToken path="/application/subscription_manager/inputs.yaml" pos="42:4:4" line-data="    type: string">`string`</SwmToken> | - | - | Direct URL to the OpenSSL Light Win64 MSI File.<br>Can be retrieved from: https://slproweb.com/products/Win32OpenSSL.html<br>Example: https://slproweb.com/download/Win64OpenSSL_Light-X_X_X.msi | Will be shown only when environment_type is set to "internet_connected" |
 
-# 5 Install Workflow
+# 5. Install Workflow
 
 ### create
 
@@ -466,15 +465,15 @@ Each inputs file is imported into the main blueprint so this distribution is not
 - smtp_enable → <SwmToken path="/application/blueprint.yaml" pos="27:4:4" line-data="              get_input: smtp_enable">`smtp_enable`</SwmToken>
 - smtp_password_secret_name → <SwmToken path="/application/blueprint.yaml" pos="29:4:4" line-data="              get_input: smtp_password_secret_name">`smtp_password_secret_name`</SwmToken>
 
-# 6 Uninstall Workflow
+# 6. Uninstall Workflow
 
-## 6.1 Uninstall Workflow Execution Steps
+## 6.1. Uninstall Workflow Execution Steps
 ### TODO
 
-## 6.2 Uninstall Workflow Execution Operations
+## 6.2. Uninstall Workflow Execution Operations
 ### TODO
 
-# 7 Deployment Capabilities and Outputs
+# 7. Deployment Capabilities and Outputs
 After a successful deployment, you will get the following capabilities:
 
 | Name | Description |
@@ -509,18 +508,18 @@ After a successful deployment, you will get the following capabilities:
 | <SwmToken path="/application/mssql_server/outputs.yaml" pos="20:1:1" line-data="  microsoft_sql_vm_user_password_secret_name:">`microsoft_sql_vm_user_password_secret_name`</SwmToken> | Microsoft SQL Server Virtual Machine User Password Secret Name |
 
 
-# 8 Interaction Diagram for Native Edge Endpoint Installation
+# 8. Interaction Diagram for Native Edge Endpoint Installation
 ### TODO
 
 - <SwmToken path="/infrastructure/xmpro_suite/nativeedge_endpoint/components/application_designer/blueprint.yaml" pos="51:4:7" line-data="              - &quot;AD-vm-&quot;">`AD-vm-`</SwmToken>
 
 
-# 9 Monitoring and Debugging
+# 9. Monitoring and Debugging
 ### TODO
 
 # 10. Accessing Solution
 
-## 10.1 Open XMPro Website
+## 10.1. Open XMPro Website
 ### TODO
 
 
